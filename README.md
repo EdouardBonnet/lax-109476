@@ -188,6 +188,13 @@ from the proved global center and shape bounds.
 `RamNonzero` verifies a linear scan for a nonzero rational coordinate.
 `RamNormalSelection` verifies extraction of the first violated integer row
 and replacement of a zero row by the fixed nonzero normal used by the trajectory.
+`RamSearchStep` verifies separation followed by a cut or termination at a
+feasible center, preserving the original constraint count across shape updates.
+`RamSearchLoop` verifies the initialized bounded search, its exact agreement
+with the first feasible center in the mathematical trajectory, and a linear
+factor in the cut budget for its instruction bound.
+`RamSearchBounds` supplies sufficient polynomial word and instruction bounds
+for this complete initialized search, uniformly over every larger word width.
 `RecoveryArithmeticBounds` and `SolverOutputBounds` bound the coordinates
 actually produced by recovery and prove the cubic size bound for the returned
 certificate. `DecodingSizeBounds` proves that decoding noncanonical input

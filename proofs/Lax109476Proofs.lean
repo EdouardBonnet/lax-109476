@@ -99,3 +99,6 @@ import Lax109476Proofs.RamRowCopy
 import Lax109476Proofs.RamTrajectoryBounds
 import Lax109476Proofs.RamNonzero
 import Lax109476Proofs.RamNormalSelection
+import Lax109476Proofs.RamSearchStep
+import Lax109476Proofs.RamSearchLoop
+import Lax109476Proofs.RamSearchBounds
