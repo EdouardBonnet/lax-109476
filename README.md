@@ -71,10 +71,27 @@ factor, and conditioning bounds, and connects the update to shape rounding.
 It gives an iterated conditioning bound and a dyadic precision schedule whose
 denominator bit length is linear in the conditioning exponent and dimension.
 These internal lemmas are not connected to a solver proof and do not make the
-solver node proved. A complete rational center update and its precision schedule,
-termination and feasibility bounds, exact recovery of certificates, and uniform
-RAM execution remain to be formalized. The conditioning induction assumes the
-per-step bounds; it does not yet verify a complete rounded iteration.
+solver node proved.
+
+The additional `EllipsoidCenter`, `EllipsoidPrecision`, `EllipsoidDeterminant`,
+`EllipsoidIteration`, and `EllipsoidSequence` proof modules define and verify the
+complete stored rational center and shape update. A dyadic denominator handles
+both center errors and the relative shape error. Relative quadratic-form bounds
+imply determinant bounds, so the same rounded update both preserves the cut
+portion and contracts the square-root determinant. The actual recursive shape
+sequence starts at the identity and remains positive definite with lower form
+bound `2^(-2k)` and upper form bound `4^k`. The center sequence preserves points
+retained by the supplied cuts. At iteration `k`, the grid denominator has
+`2k + 3n + 10` bits. After `4(n+1)(Bn+1)` cuts, the square-root determinant is
+below the threshold `2^(-Bn)`.
+
+These proofs assume dimension at least two and externally supplied cut normals
+whose squared lengths are at least one. They do not construct the LP separation
+routine, supply a rational-polyhedron feasibility radius, or bound the complete
+LP algorithm's runtime. The grid-size result bounds the denominator, not all
+state encodings or intermediate arithmetic. LP feasibility and certificate-size
+bounds independent of a solver, exact certificate recovery, the zero- and
+one-dimensional cases, and uniform RAM execution remain to be formalized.
 
 ## Exact computation
 

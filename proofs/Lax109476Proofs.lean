@@ -12,6 +12,11 @@ import Lax109476Proofs.EllipsoidStep
 import Lax109476Proofs.RationalRounding
 import Lax109476Proofs.EllipsoidRounding
 import Lax109476Proofs.EllipsoidBounds
+import Lax109476Proofs.EllipsoidCenter
+import Lax109476Proofs.EllipsoidPrecision
+import Lax109476Proofs.EllipsoidDeterminant
+import Lax109476Proofs.EllipsoidIteration
+import Lax109476Proofs.EllipsoidSequence
 import Lax109476Proofs.Recession
 import Lax109476Proofs.RationalFeasibility
 import Lax109476Proofs.CertificateExistence
