@@ -291,8 +291,31 @@ has polynomial instruction and word bounds for every larger word width.
 `RamNaturalPower`, `RamCoordinateCap`, and `RamFeasibilityScales` implement
 bounded natural powers, factorials, the coordinate cap, the relaxation
 denominator, the outer scale, the ball exponent, and the cut budget. These are internal steps; the public exact-solver
-theorem remains open until normalization, exact recovery, and output are
+theorem remains open until exact recovery, certificates, and output are
 connected to the registered RAM.
+
+The bounded feasibility-parameter modules prove polynomial word and runtime
+bounds for the complete parameter setup. `RamPadMatrix`, `RamPadBound`, and
+`RamQueryPadding` build the padded matrix and bounds and set their dimensions.
+`RamNormalizedEntry`, `RamNormalizedMatrix`, `RamNormalizedBoundEntry`,
+`RamNormalizedBound`, and `RamNormalizeQuery` build the scaled inequalities
+and relaxed nonnegativity rows and produce the exact stored input required
+by ellipsoid search. `RamNormalizedBounds` bounds the coefficient heights of
+that system. `RamFeasibilitySetup`, `RamIntegerFeasibility`, and
+`RamPaddedFeasibility` connect these builders to bounded ellipsoid search.
+`RamFeasibilityQuery`, `RamRationalFeasibility`, and `RamEncodedFeasibility`
+compose decoding, canonical input-size computation, denominator clearing,
+padding, parameter setup, normalization, and exact feasibility decision.
+Their correctness proofs apply to every input dimension, with explicit
+uniform polynomial word and instruction bounds and every larger word width.
+The public solver node is still open pending the recovery, certificate,
+and output connection. `RamContinuedFractionStep` implements the exact
+floor and inverted fractional tail on reduced nonnegative rationals.
+`ContinuedFractionBounds` bounds iterated tails and convergents, and
+`RamContinuedFractionStack` implements the bounded quotient-stack loop.
+`RamArrayRelabel` proves that fixed workspace copies preserve the same
+execution, bounds, and costs, allowing distinct certificate query dimensions
+in a single uniform command.
 
 ## Build and preview
 
