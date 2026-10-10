@@ -5,3 +5,6 @@ import Lax109476Proofs.Optimization
 import Lax109476Proofs.Farkas
 import Lax109476Proofs.Attainment
 import Lax109476Proofs.OutputSize
+import Lax109476Proofs.Elimination.AlgebraHelpers
+import Lax109476Proofs.Elimination.FourierMotzkin
+import Lax109476Proofs.Elimination.Farkas1

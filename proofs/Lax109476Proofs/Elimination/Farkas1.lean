@@ -47,27 +47,6 @@ def Farkas1Primal {n : ℕ} (A : Matrix m (Fin n) F) (b : m → F) : Prop :=
 def Farkas1Dual {n : ℕ} (A : Matrix m (Fin n) F) (b : m → F) : Prop :=
   ∃ y : m → F, (∀ j, 0 ≤ y j) ∧ (y ᵥ* A = 0) ∧ (y ⬝ᵥ b < 0)
 
-/-!
-## Mutual Exclusivity
-Matrix associativity makes this trivial compared to manual sums.
--/
-
-theorem Farkas1Exclusive {n : ℕ} (A : Matrix m (Fin n) F) (b : m → F) :
-  ¬(Farkas1Primal A b ∧ Farkas1Dual A b) := by
-  rintro ⟨⟨x, hAx⟩, ⟨y, hy, hyA, hyb⟩⟩
-  have hyb_nonneg : 0 ≤ y ⬝ᵥ b := by
-    have hdot_le : y ⬝ᵥ (A *ᵥ x) ≤ y ⬝ᵥ b := by
-      simpa using dotProduct_le_dotProduct_of_nonneg_left hAx hy
-    have hdot_eq : y ⬝ᵥ (A *ᵥ x) = 0 := by
-      calc
-        y ⬝ᵥ (A *ᵥ x) = (y ᵥ* A) ⬝ᵥ x := by
-          simpa using Matrix.dotProduct_mulVec y A x
-        _ = 0 := by simp [hyA]
-    have hzero : 0 ≤ y ⬝ᵥ (A *ᵥ x) := by
-      simp [hdot_eq]
-    exact le_trans hzero hdot_le
-  linarith
-
 private theorem liftDual_of_fourierMotzkin {κ : Type*} [Fintype κ] {n : ℕ}
     (A : Matrix m (Fin (n + 1)) F) (b : m → F) (M : Matrix κ m F)
     (hM_last : ∀ i, (M * A) i (Fin.last n) = 0)
