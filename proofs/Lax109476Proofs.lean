@@ -68,3 +68,5 @@ import Lax109476Proofs.DecodingSizeBounds
 import Lax109476Proofs.WordSolverSize
 import Lax109476Proofs.RamRounding
 import Lax109476Proofs.RamEncoding
+import Lax109476Proofs.RamPrimitiveBounds
+import Lax109476Proofs.RamRationalArrays

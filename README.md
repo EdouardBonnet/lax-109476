@@ -138,6 +138,9 @@ zero, and `RamBitLength` verifies a linear-time bit-counting loop.
 `RamRounding` connects grid flooring and upper square-root approximation to
 verified integer division, GCD, and square-root instructions. `RamEncoding`
 verifies canonical rational output, including clearing the sign of zero.
+`RamPrimitiveBounds` gives uniform costs linear in the operands' bit-length
+cap, and `RamRationalArrays` verifies bounds-checked rational loads and
+canonical stores using three arrays for signs, numerators, and denominators.
 `RecoveryArithmeticBounds` and `SolverOutputBounds` bound the coordinates
 actually produced by recovery and prove the cubic size bound for the returned
 certificate. `DecodingSizeBounds` proves that decoding noncanonical input
