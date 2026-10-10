@@ -141,6 +141,9 @@ verifies canonical rational output, including clearing the sign of zero.
 `RamPrimitiveBounds` gives uniform costs linear in the operands' bit-length
 cap, and `RamRationalArrays` verifies bounds-checked rational loads and
 canonical stores using three arrays for signs, numerators, and denominators.
+`RamDotProduct` verifies the full rational dot-product loop, including empty
+vectors, preservation of the input arrays, and an instruction bound polynomial
+in vector length and operand bit length.
 `RecoveryArithmeticBounds` and `SolverOutputBounds` bound the coordinates
 actually produced by recovery and prove the cubic size bound for the returned
 certificate. `DecodingSizeBounds` proves that decoding noncanonical input

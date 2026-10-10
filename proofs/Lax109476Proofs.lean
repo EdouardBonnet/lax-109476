@@ -70,3 +70,5 @@ import Lax109476Proofs.RamRounding
 import Lax109476Proofs.RamEncoding
 import Lax109476Proofs.RamPrimitiveBounds
 import Lax109476Proofs.RamRationalArrays
+import Lax109476Proofs.RamFrame
+import Lax109476Proofs.RamDotProduct
