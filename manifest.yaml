@@ -1,0 +1,29 @@
+specVersion: "1"
+id: lax-109476
+leanVersion: "v4.33.0"
+mathlibVersion: "db584cd6d46c92f209a44c0f1c829460d327499d"
+title: "Linear Programming: Duality, Certificates, and Polynomial-Time Optimization"
+authors:
+  - name: Édouard Bonnet and Codex 6
+    github: EdouardBonnet
+bibEntries:
+  - |
+    @book{Schrijver1986,
+      author = {Schrijver, Alexander},
+      title = {Theory of Linear and Integer Programming},
+      publisher = {Wiley},
+      year = {1986},
+      isbn = {978-0-471-90854-8}
+    }
+  - |
+    @article{Khachiyan1979,
+      author = {Khachiyan, Leonid G.},
+      title = {A Polynomial Algorithm in Linear Programming},
+      journal = {Doklady Akademii Nauk SSSR},
+      volume = {244},
+      number = {5},
+      pages = {1093--1096},
+      year = {1979},
+      note = {English translation: Soviet Mathematics Doklady 20, 191--194},
+      url = {https://www.mathnet.ru/eng/dan42319}
+    }
