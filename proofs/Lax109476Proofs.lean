@@ -85,3 +85,15 @@ import Lax109476Proofs.RamCenterUpdate
 import Lax109476Proofs.RamShapeCoordinate
 import Lax109476Proofs.RamShapeUpdate
 import Lax109476Proofs.RamEllipsoidCoefficients
+import Lax109476Proofs.RamEllipsoidUpdate
+import Lax109476Proofs.RamEllipsoidWordBounds
+import Lax109476Proofs.RamEllipsoidPrecision
+import Lax109476Proofs.RamEllipsoidStep
+import Lax109476Proofs.RamCopy
+import Lax109476Proofs.RamCommitState
+import Lax109476Proofs.RamEllipsoidStoredBounds
+import Lax109476Proofs.RamAdvanceState
+import Lax109476Proofs.RamEllipsoidBitBounds
+import Lax109476Proofs.RamInitialState
+import Lax109476Proofs.RamRowCopy
+import Lax109476Proofs.RamTrajectoryBounds

@@ -164,6 +164,27 @@ mathematical update, and a polynomial instruction bound.
 `RamEllipsoidCoefficients` verifies initialization and storage of all five
 step coefficients, derives their rational height bounds, and bounds the
 instruction count by a polynomial.
+`RamEllipsoidUpdate` composes the center and shape loops.
+`RamEllipsoidWordBounds` provides one sufficient word-capacity bound for
+the whole cut, and `RamEllipsoidPrecision` verifies the precision schedule
+while preserving the stored quadratic form. `RamEllipsoidStep` verifies
+the complete cut body against the mathematical rounded step and proves a
+polynomial instruction bound.
+`RamCopy` verifies copying canonical rational arrays in linear time, preserving
+the source. `RamCommitState` installs the next center and shape for the following
+iteration and restores the logical dimension after copying the flattened matrix.
+`RamEllipsoidStoredBounds` bounds the rational entries produced by a cut,
+and `RamAdvanceState` verifies the complete cut, state installation, and
+counter increment with one uniform RAM command and an explicit cost bound.
+`RamEllipsoidBitBounds` gives a sufficient polynomial word width from the
+dimension, coefficient bit length, and iteration number, including every larger
+word width. `RamInitialState` verifies initialization of the identity shape,
+zero center, and iteration counter, including empty dimensions.
+`RamRowCopy` copies a selected matrix row into the normal vector with a
+linear instruction bound while preserving the source matrix.
+`RamTrajectoryBounds` connects the RAM update to the actual ellipsoid
+trajectory and derives one word bound for every cut up to a fixed budget
+from the proved global center and shape bounds.
 `RecoveryArithmeticBounds` and `SolverOutputBounds` bound the coordinates
 actually produced by recovery and prove the cubic size bound for the returned
 certificate. `DecodingSizeBounds` proves that decoding noncanonical input
