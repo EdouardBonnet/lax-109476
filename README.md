@@ -155,7 +155,9 @@ verifies the stored quadratic form and its polynomial instruction bound.
 the quadratic-form factors, and the dyadic precision schedule.
 `RamMatrixStorage` connects flat array entries to matrix rows, and
 `RamFractionInterface` exposes checked arithmetic and signed subtraction
-through rational-value specifications.
+through rational-value specifications. `RamCenterCoordinate` and
+`RamCenterUpdate` verify the complete rounded center-update loop, its relation
+to the mathematical ellipsoid center, and a polynomial instruction bound.
 `RecoveryArithmeticBounds` and `SolverOutputBounds` bound the coordinates
 actually produced by recovery and prove the cubic size bound for the returned
 certificate. `DecodingSizeBounds` proves that decoding noncanonical input
