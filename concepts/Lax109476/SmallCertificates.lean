@@ -13,10 +13,11 @@ The polynomial is universal over all dimensions and coefficient values.
 
 The statement includes all three outcomes, and thus also asserts the
 existence of exact rational witnesses. The size counts signs, numerators,
-denominators, and outcome data in the fixed word-list encoding. It concerns
-certificate existence, independently of the algorithm that finds a certificate.
-Such bounds follow from the standard determinant bounds for rational
-polyhedra and their primal, dual, and recession systems.
+denominators, and outcome data in the fixed word-list encoding. The supplied
+conditional proof takes the exact solver's valid output certificate and bounds
+its binary size using polynomial instruction and word-length bounds. It
+therefore depends on the solver theorem. An independent proof from determinant
+bounds for rational polyhedra is not supplied.
 -/
 
 namespace Lax109476.SmallCertificates

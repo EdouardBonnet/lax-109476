@@ -2,3 +2,6 @@ import Lax109476Proofs.Basic
 import Lax109476Proofs.Duality
 import Lax109476Proofs.Certificates
 import Lax109476Proofs.Optimization
+import Lax109476Proofs.Farkas
+import Lax109476Proofs.Attainment
+import Lax109476Proofs.OutputSize

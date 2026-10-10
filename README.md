@@ -13,20 +13,37 @@ over real variables, with rational output certificates.
 
 | Result | Supplied proof | Assumptions from this submission |
 | --- | --- | --- |
+| Fourier–Motzkin elimination | Nonnegative row combinations and finite compatible bounds | None |
+| Farkas certificate existence | Induct on variables after adding nonnegativity rows | Fourier–Motzkin elimination |
 | Weak duality | Finite bilinear sum and inequality calculation | None |
 | Complementary slackness | Nonnegative summands of the duality gap | None |
 | Farkas certificate soundness | Contradiction from a nonnegative bilinear sum | None |
 | Farkas alternative | Combine existence and soundness | Farkas certificate existence; certificate soundness |
 | Optimal dual multipliers | Apply Farkas to the multiplier system; contradict primal optimality | Farkas certificate existence; weak duality |
+| Primal attainment | Apply Farkas to the system attaining the finite supremum | Farkas certificate existence; Farkas soundness; weak duality |
 | Strong duality | Obtain an attained primal optimizer and matching multipliers | Primal attainment; optimal dual multipliers |
 | Improving-direction soundness | Move beyond any proposed bound along a feasible ray | None |
 | Rational certificate soundness | Cast exact checks into the reals and verify all three outcomes | Weak duality; Farkas soundness; improving-direction soundness |
+| Polynomial RAM output size | At most one output word per instruction; bounded bit size per word | None |
+| Polynomial-size rational certificates | Bound the encoding of the exact solver's output | Exact polynomial-time solver; polynomial RAM output size |
 | Certified polynomial-time optimization | Reuse the solver's output and apply soundness | Exact polynomial-time solver; rational certificate soundness |
 
-Four proof obligations remain open: Farkas certificate existence, primal
-attainment, polynomial-size rational certificate existence, and the exact
-polynomial-time solver. Conditional proofs preserve these dependencies;
-they do not claim that the foundations or solver have been proved.
+The real LP duality and certificate-soundness chain is now fully proved:
+the elimination proof closes Farkas' lemma, and Farkas' lemma closes primal
+attainment and optimal dual multipliers, hence strong duality.
+
+The exact polynomial-time solver is the remaining open foundation. The
+polynomial-size certificate result and certified optimization have conditional
+proofs depending on this solver. These statements remain unproved in the
+network until the solver is proved. The certificate-size proof is a corollary
+of polynomial output size; it is not an independent determinant-bound proof.
+
+Finishing the solver requires a formal polynomial-time LP algorithm, exact
+rational arithmetic and rounding bounds, exact certificate recovery, and
+execution and runtime proofs for the registered RAM (or a proved reduction
+through an equivalent computational model). Fourier–Motzkin elimination
+supplies no polynomial runtime bound. No new algorithmic axiom has been
+added to discharge this obligation.
 
 ## Exact computation
 
@@ -69,12 +86,20 @@ Run `lax serve . --port 8124` for a local preview.
 
 ## Sources and use by Leighton–Rao
 
-The mathematical foundations follow Alexander Schrijver's *Theory of
+The mathematical statements follow Alexander Schrijver's *Theory of
 Linear and Integer Programming* (1986), particularly the duality and
 rational-polyhedron results. The polynomial-time solvability claim is the
 classical rational LP theorem originating with
 [Khachiyan (1979)](https://www.mathnet.ru/eng/dan42319), with exact outcome
 certificates. No ellipsoid implementation is included.
+
+The elimination and unrestricted-variable Farkas proofs adapt
+[Jyotirmoy Bhattacharya's `farkas_lean`](https://github.com/jmoy/farkas_lean)
+at revision `30c319dd52ca89cfa82a68352b1f39f4f3026fc2`. The adaptation
+specializes the Farkas induction to real coefficients, exposes the elimination
+step in the Lax proof network, and updates the proof to the pinned toolchain.
+Each adapted source retains the original MIT license; see
+[the attribution and license](proofs/THIRD_PARTY_LICENSES.md).
 
 This submission supplies generic LP foundations. A multicommodity-flow
 submission still needs to express its own LP, establish the correspondence

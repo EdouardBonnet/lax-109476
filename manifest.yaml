@@ -8,6 +8,14 @@ authors:
     github: EdouardBonnet
 bibEntries:
   - |
+    @misc{Bhattacharya2026,
+      author = {Bhattacharya, Jyotirmoy},
+      title = {Farkas Lean: Theorems of the Alternative via Fourier--Motzkin Elimination},
+      year = {2026},
+      url = {https://github.com/jmoy/farkas_lean},
+      note = {MIT-licensed Lean proof; revision 30c319dd52ca89cfa82a68352b1f39f4f3026fc2}
+    }
+  - |
     @book{Schrijver1986,
       author = {Schrijver, Alexander},
       title = {Theory of Linear and Integer Programming},

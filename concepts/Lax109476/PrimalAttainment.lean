@@ -13,7 +13,10 @@ the feasible set, it attains its maximum at a feasible point.
 No compactness assumption is imposed on the feasible polyhedron. Linear
 objectives attain their finite optima on nonempty polyhedra even when those
 polyhedra are unbounded. This is the attainment step used with Farkas'
-lemma to obtain an optimal dual certificate.
+lemma to obtain an optimal dual certificate. The supplied proof applies Farkas'
+lemma to the original system with an objective threshold equal to the finite
+supremum; a separating certificate would contradict feasibility or produce
+a strictly smaller dual upper bound.
 -/
 
 namespace Lax109476.PrimalAttainment
