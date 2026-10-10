@@ -122,6 +122,8 @@ Its functional correctness is proved for all dimensions and all rational inputs.
 Oversized malformed dimensions are rejected before vector allocation. Search
 stops at a feasible center and at the first valid certificate, without allocating
 the full cut budget or evaluating later certificate systems.
+The scan stores each updated matrix and center in vectors and advances the
+stored state once per failed separation test.
 
 `RationalArithmeticBounds` proves numerator and denominator bounds for exact
 addition, multiplication, inversion, and finite sums, together with their
@@ -129,7 +131,17 @@ encoding bounds. `BinaryOptimizationBounds` bounds dyadic search thresholds and
 reconstructed coordinates for arbitrary query answers, including unsuccessful
 certificate branches. `RamArithmetic` supplies verified GCD and fraction
 reduction programs, and `RamSquareRoot` supplies verified integer square root;
-their costs are linear in bit length. `RamTransfer` proves the bridge from
+their costs are linear in bit length. `RamRational` verifies signed addition,
+multiplication, and inversion with reduced numerators and denominators.
+`RamComparison` verifies exact order comparisons, including either sign of
+zero, and `RamBitLength` verifies a linear-time bit-counting loop.
+`RecoveryArithmeticBounds` and `SolverOutputBounds` bound the coordinates
+actually produced by recovery and prove the cubic size bound for the returned
+certificate. `DecodingSizeBounds` proves that decoding noncanonical input
+fractions cannot increase canonical input size. `WordSolverSize` gives the
+cubic output-size bound on every word list and a sufficient polynomial word
+width for the physical input and returned output.
+`RamTransfer` proves the bridge from
 bounded structured execution through Lax's verified compiler to the registered
 uniform polynomial-time RAM predicate. Bounds for complete intermediate
 computations and execution and runtime proofs for the

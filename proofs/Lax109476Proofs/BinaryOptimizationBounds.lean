@@ -64,6 +64,29 @@ theorem bisect_height (query : ℚ → Bool) (B k : ℕ) :
   rw [ha', hb']
   exact ⟨hg a (hab.trans hb), hg b hb⟩
 
+theorem bisect_mid_height (query : ℚ → Bool) (B k : ℕ) :
+    Height (((bisect query 0 B k).1 + (bisect query 0 B k).2) / 2)
+      (4 * ((B + 1) * 2 ^ k) ^ 2) := by
+  obtain ⟨hl, hu⟩ := bisect_height query B k
+  have h2 : Height 2 2 := by norm_num [Height]
+  have h := height_div _ (2 : ℚ) _ 2 (height_add _ _ _ _ hl hu) h2
+  convert h using 1
+  ring
+
+theorem bisect_mid_encoding (query : ℚ → Bool) (B k : ℕ) :
+    Lax759944.BinaryWordEncoding.bitSize
+      (Lax109476.RationalEncoding.encodeRational
+        (((bisect query 0 B k).1 + (bisect query 0 B k).2) / 2)) ≤
+      20 + 4 * B.size + 4 * k := by
+  have he := height_encoding _ _ (bisect_mid_height query B k)
+  have hm := RationalSizeBounds.size_mul_le 4 (((B + 1) * 2 ^ k) ^ 2)
+  have hp := RationalSizeBounds.size_pow_le ((B + 1) * 2 ^ k) 2
+  have hb := RationalSizeBounds.size_mul_le (B + 1) (2 ^ k)
+  have ha := RationalSizeBounds.size_add_one_le B
+  have h4 : (4 : ℕ).size = 3 := by decide
+  rw [Nat.size_pow] at hb
+  omega
+
 /-- Successful reconstruction is bounded even when no attained minimum
 exists. Thus a failed certificate branch cannot grow later query data. -/
 theorem minimum_height (query : ℚ → Bool) (B : ℕ) (q : ℚ)

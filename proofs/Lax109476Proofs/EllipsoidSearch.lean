@@ -9,6 +9,24 @@ open Lax109476.RationalCertificates
 open RationalSeparation EllipsoidRounding EllipsoidCenter EllipsoidPrecision
 open EllipsoidIteration EllipsoidSequence EllipsoidTermination
 
+/-- Materialize every shape and center entry once per update. Subsequent
+matrix operations read the stored arrays rather than recomputing entries. -/
+def cacheState {n : ℕ} (state : Matrix (Fin n) (Fin n) ℚ × (Fin n → ℚ)) :
+    Matrix (Fin n) (Fin n) ℚ × (Fin n → ℚ) :=
+  let rows : Vector (Vector ℚ n) n := Vector.ofFn (fun i => Vector.ofFn (state.1 i))
+  let center : Vector ℚ n := Vector.ofFn state.2
+  ((fun i j => (rows.get i).get j), fun i => center.get i)
+
+@[simp] theorem cacheState_eq {n : ℕ}
+    (state : Matrix (Fin n) (Fin n) ℚ × (Fin n → ℚ)) : cacheState state = state := by
+  apply Prod.ext
+  · funext i j
+    simp [cacheState, Vector.get]
+    rfl
+  · funext i
+    simp [cacheState, Vector.get]
+    rfl
+
 def fallbackNormal (n : ℕ) : Fin n → ℚ := fun j => if j.val = 0 then 1 else 0
 
 /-- A nonzero integer violated row supplies the normal; a fixed nonzero
@@ -19,14 +37,18 @@ def selectedNormal {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ) (b : Fin m → �
   | none => fallbackNormal n
   | some i => if A i = 0 then fallbackNormal n else rationalRow A i
 
+def nextState {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ) (b : Fin m → ℚ)
+    (k : ℕ) (old : Matrix (Fin n) (Fin n) ℚ × (Fin n → ℚ)) :
+    Matrix (Fin n) (Fin n) ℚ × (Fin n → ℚ) :=
+    let a := selectedNormal A b old.2
+    let D := gridDenominator (2 * k + 2) (2 * n + 4) n
+    cacheState
+      (roundedStepShape n old.1 a D (stepAccuracy n), roundedCenter n old.1 a old.2 D)
+
 def trajectory {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ) (b : Fin m → ℚ) :
     ℕ → Matrix (Fin n) (Fin n) ℚ × (Fin n → ℚ)
   | 0 => (1, 0)
-  | k + 1 =>
-    let old := trajectory A b k
-    let a := selectedNormal A b old.2
-    let D := gridDenominator (2 * k + 2) (2 * n + 4) n
-    (roundedStepShape n old.1 a D (stepAccuracy n), roundedCenter n old.1 a old.2 D)
+  | k + 1 => nextState A b k (trajectory A b k)
 
 def normalSchedule {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ) (b : Fin m → ℚ)
     (k : ℕ) : Fin n → ℚ := selectedNormal A b (trajectory A b k).2
@@ -66,7 +88,7 @@ theorem trajectory_eq_sequences {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ)
   induction k with
   | zero => exact ⟨rfl, rfl⟩
   | succ k ih =>
-    simp only [trajectory, shapes, centers]
+    simp only [trajectory, nextState, shapes, centers, cacheState_eq]
     have ha : selectedNormal A b (trajectory A b k).2 = normalSchedule A b k := rfl
     rw [ha, ih.1, ih.2]
     exact ⟨rfl, rfl⟩
@@ -83,16 +105,39 @@ theorem findFirst_eq_find (p : ℕ → Bool) (start count : ℕ) :
   | succ count ih =>
     cases hp : p start <;> simp [findFirst, List.range'_succ, ih, hp]
 
+/-- Advance the stored state once per failed test, keeping the iteration
+index synchronized with the precision schedule. -/
+def scanStates {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ) (b : Fin m → ℚ) :
+    ℕ → ℕ → (Matrix (Fin n) (Fin n) ℚ × (Fin n → ℚ)) → Option ℕ
+  | _, 0, _ => none
+  | start, count + 1, state =>
+    if firstViolation A b state.2 = none then some start
+    else scanStates A b (start + 1) count (nextState A b start state)
+
+theorem scanStates_eq_findFirst {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ)
+    (b : Fin m → ℚ) (start count : ℕ) :
+    scanStates A b start count (trajectory A b start) =
+      findFirst (fun k => decide (firstViolation A b (trajectory A b k).2 = none)) start count := by
+  induction count generalizing start with
+  | zero => rfl
+  | succ count ih =>
+    simp only [scanStates, findFirst, decide_eq_true_eq]
+    by_cases h : firstViolation A b (trajectory A b start).2 = none
+    · rw [if_pos h, if_pos h]
+    · rw [if_neg h, if_neg h]
+      exact ih (start + 1)
+
 /-- Inspect the bounded sequence of centers with exact rational comparisons.
 The computation allocates no list of the entire worst-case iteration budget. -/
 def findIteration {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ) (b : Fin m → ℚ)
     (K : ℕ) : Option ℕ :=
-  findFirst (fun k => decide (firstViolation A b (trajectory A b k).2 = none)) 0 (K + 1)
+  scanStates A b 0 (K + 1) (1, 0)
 
 theorem findIteration_eq_find {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ) (b : Fin m → ℚ)
     (K : ℕ) : findIteration A b K =
       (List.range (K + 1)).find? (fun k => decide (firstViolation A b (trajectory A b k).2 = none)) := by
-  rw [findIteration, findFirst_eq_find, List.range_eq_range']
+  change scanStates A b 0 (K + 1) (trajectory A b 0) = _
+  rw [scanStates_eq_findFirst, findFirst_eq_find, List.range_eq_range']
 
 def search {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ) (b : Fin m → ℚ)
     (K : ℕ) : Option (Fin n → ℚ) :=

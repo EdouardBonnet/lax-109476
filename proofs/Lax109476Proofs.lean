@@ -59,3 +59,10 @@ import Lax109476Proofs.RamTransfer
 import Lax109476Proofs.RamArithmetic
 import Lax109476Proofs.RamSquareRoot
 import Lax109476Proofs.EllipsoidArithmeticBounds
+import Lax109476Proofs.RamRational
+import Lax109476Proofs.RamComparison
+import Lax109476Proofs.RamBitLength
+import Lax109476Proofs.RecoveryArithmeticBounds
+import Lax109476Proofs.SolverOutputBounds
+import Lax109476Proofs.DecodingSizeBounds
+import Lax109476Proofs.WordSolverSize
