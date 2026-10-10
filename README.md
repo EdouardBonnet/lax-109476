@@ -216,7 +216,14 @@ invalid signs and zero denominators, retains an earlier invalidity flag, and
 uses a canonical zero placeholder after failure so subsequent stores remain
 bounded. Successful vector parses match the functional decoder, and row-major
 matrix input matches the separation oracle's flat storage, including empty
-dimensions. Execution tests use the registered RAM directly.
+dimensions. Execution tests use the registered RAM directly. The `RamReadHeader`,
+`RamReadBlock`, `RamReadBody`, and `RamDecoder` modules connect these pieces
+into one uniform LP decoder. It rejects excessive dimensions before the
+matrix count or array loops, and rejects trailing data. Its complete word
+bound is `4 * (L + 2)` before compiler-layout allowance, and its instruction
+bound is `(36 * (L + 1) + 115) * (L² + 4L + 3) + 127` for input bit size `L`.
+The decoder is proved to load exactly the registered LP encoding in every
+dimension and at every larger word width.
 
 The `StandardForm`, `DeterminantBounds`, `SmallFeasiblePoint`,
 `RationalSizeBounds`, `EncodingSize`, `IntegerEncoding`, `IntegerCertificates`,
