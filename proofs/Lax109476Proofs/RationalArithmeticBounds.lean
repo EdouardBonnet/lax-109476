@@ -67,6 +67,22 @@ theorem height_inv (q : ℚ) (B : ℕ) (hq : Height q B) : Height q⁻¹ B := by
       simpa using Nat.mul_le_mul_right q.den hs
     exact ⟨hnum.trans hq.2, by rw [Rat.den_inv_of_ne_zero hz]; exact hq.1⟩
 
+theorem height_nat (v B : ℕ) (hv : v ≤ B) (hB : 1 ≤ B) : Height (v : ℚ) B := by
+  simpa [Height] using And.intro hv hB
+
+theorem height_sub (q r : ℚ) (B C : ℕ) (hq : Height q B) (hr : Height r C) :
+    Height (q - r) (2 * B * C) := by
+  simpa only [sub_eq_add_neg] using height_add q (-r) B C hq (height_neg r C hr)
+
+theorem height_div (q r : ℚ) (B C : ℕ) (hq : Height q B) (hr : Height r C) :
+    Height (q / r) (B * C) := by
+  simpa only [div_eq_mul_inv] using height_mul q r⁻¹ B C hq (height_inv r C hr)
+
+theorem height_pow (q : ℚ) (B k : ℕ) (hq : Height q B) : Height (q ^ k) (B ^ k) := by
+  induction k with
+  | zero => simp [Height]
+  | succ k ih => simpa only [pow_succ] using height_mul (q ^ k) q (B ^ k) B ih hq
+
 theorem height_sum {ι : Type*} (s : Finset ι) (f : ι → ℚ) (B : ℕ)
     (hf : ∀ i ∈ s, Height (f i) B) :
     Height (∑ i ∈ s, f i) ((2 * B) ^ s.card) := by

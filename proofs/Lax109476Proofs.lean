@@ -54,3 +54,8 @@ import Lax109476Proofs.CertificateSearch
 import Lax109476Proofs.WordDecoding
 import Lax109476Proofs.WordSolver
 import Lax109476Proofs.RationalArithmeticBounds
+import Lax109476Proofs.BinaryOptimizationBounds
+import Lax109476Proofs.RamTransfer
+import Lax109476Proofs.RamArithmetic
+import Lax109476Proofs.RamSquareRoot
+import Lax109476Proofs.EllipsoidArithmeticBounds

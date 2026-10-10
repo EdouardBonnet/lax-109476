@@ -125,7 +125,14 @@ the full cut budget or evaluating later certificate systems.
 
 `RationalArithmeticBounds` proves numerator and denominator bounds for exact
 addition, multiplication, inversion, and finite sums, together with their
-encoding bounds. Bounds for complete intermediate computations and execution and runtime proofs for the
+encoding bounds. `BinaryOptimizationBounds` bounds dyadic search thresholds and
+reconstructed coordinates for arbitrary query answers, including unsuccessful
+certificate branches. `RamArithmetic` supplies verified GCD and fraction
+reduction programs, and `RamSquareRoot` supplies verified integer square root;
+their costs are linear in bit length. `RamTransfer` proves the bridge from
+bounded structured execution through Lax's verified compiler to the registered
+uniform polynomial-time RAM predicate. Bounds for complete intermediate
+computations and execution and runtime proofs for the
 registered RAM remain to be formalized. The functional-correctness proof does
 not discharge the public polynomial-time solver theorem.
 
@@ -167,6 +174,7 @@ Pinned archive dependencies:
 | Package | Repository | Revision | Subdirectory |
 | --- | --- | --- | --- |
 | Lax759944 | https://github.com/szymtor/RAM-TM | `134e398cef46599371df99f10c9007bc34ba3868` | `concepts` |
+| Lax808846Proofs | https://github.com/lax-archive/lax-submissions | `9394e531cc51cb67a0214bca3f9264dfe97ba5c7` | `word-ram/proofs` |
 | Lax808846 (transitive) | https://github.com/lax-archive/lax-submissions | `9394e531cc51cb67a0214bca3f9264dfe97ba5c7` | `word-ram/concepts` |
 
 Lean is pinned to `v4.33.0` and mathlib to
