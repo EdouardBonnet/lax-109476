@@ -97,3 +97,5 @@ import Lax109476Proofs.RamEllipsoidBitBounds
 import Lax109476Proofs.RamInitialState
 import Lax109476Proofs.RamRowCopy
 import Lax109476Proofs.RamTrajectoryBounds
+import Lax109476Proofs.RamNonzero
+import Lax109476Proofs.RamNormalSelection

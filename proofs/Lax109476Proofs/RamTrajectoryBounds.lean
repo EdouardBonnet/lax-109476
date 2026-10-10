@@ -13,6 +13,25 @@ open Lax808846Proofs.Imp Lax808846Proofs.Reasoning
 
 def stateBits (n K l : ℕ) : ℕ := 60 + 6 * K + 14 * n + l
 
+def instructionBound (n K l : ℕ) : ℕ :=
+  let h := stateBits n K l
+  let e := magnitudeExponent n h K
+  (144 * ((n + 1) * (2 * (h + 1) + 3) + 1) + 220) * n ^ 2 +
+    (144 * ((n + 1) * (2 * ((n + 1) * (2 * (h + 1) + 3) + 1) + 3) + 1) + 292) * n +
+    (2880 * (e + 1) + 7559) * n + (14976 * (e + 1) + 36767) * (n * n) +
+    582 * (e + 1) + 1060 + 71 * n + 71 * (n * n)
+
+set_option maxRecDepth 6000 in
+theorem instructionBound_polynomial (n K l : ℕ) :
+    stepCost n (2 ^ stateBits n K l) (2 ^ magnitudeExponent n (stateBits n K l) K) +
+      71 * n + 71 * (n * n) + 60 ≤ instructionBound n K l := by
+  have h := stepCost_polynomial n (2 ^ stateBits n K l)
+    (2 ^ magnitudeExponent n (stateBits n K l) K)
+  rw [Nat.size_pow, Nat.size_pow] at h
+  have htotal := Nat.add_le_add_right h (71 * n + 71 * (n * n) + 60)
+  dsimp only [instructionBound]
+  omega
+
 theorem height_of_encoding (q : ℚ) (h : ℕ) (hq : bitSize (encodeRational q) ≤ h) :
     Height q (2 ^ h) := by
   have hs := (rational_size_bounds q).2

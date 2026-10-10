@@ -185,6 +185,9 @@ linear instruction bound while preserving the source matrix.
 `RamTrajectoryBounds` connects the RAM update to the actual ellipsoid
 trajectory and derives one word bound for every cut up to a fixed budget
 from the proved global center and shape bounds.
+`RamNonzero` verifies a linear scan for a nonzero rational coordinate.
+`RamNormalSelection` verifies extraction of the first violated integer row
+and replacement of a zero row by the fixed nonzero normal used by the trajectory.
 `RecoveryArithmeticBounds` and `SolverOutputBounds` bound the coordinates
 actually produced by recovery and prove the cubic size bound for the returned
 certificate. `DecodingSizeBounds` proves that decoding noncanonical input
