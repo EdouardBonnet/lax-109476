@@ -71,10 +71,28 @@ theorem trajectory_eq_sequences {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ)
     rw [ha, ih.1, ih.2]
     exact ⟨rfl, rfl⟩
 
-/-- Inspect the bounded sequence of centers with exact rational comparisons. -/
+/-- A bounded scan stops immediately when its predicate succeeds. -/
+def findFirst (p : ℕ → Bool) : ℕ → ℕ → Option ℕ
+  | _, 0 => none
+  | start, count + 1 => if p start then some start else findFirst p (start + 1) count
+
+theorem findFirst_eq_find (p : ℕ → Bool) (start count : ℕ) :
+    findFirst p start count = (List.range' start count).find? p := by
+  induction count generalizing start with
+  | zero => simp [findFirst]
+  | succ count ih =>
+    cases hp : p start <;> simp [findFirst, List.range'_succ, ih, hp]
+
+/-- Inspect the bounded sequence of centers with exact rational comparisons.
+The computation allocates no list of the entire worst-case iteration budget. -/
 def findIteration {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ) (b : Fin m → ℚ)
     (K : ℕ) : Option ℕ :=
-  (List.range (K + 1)).find? (fun k => decide (firstViolation A b (trajectory A b k).2 = none))
+  findFirst (fun k => decide (firstViolation A b (trajectory A b k).2 = none)) 0 (K + 1)
+
+theorem findIteration_eq_find {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ) (b : Fin m → ℚ)
+    (K : ℕ) : findIteration A b K =
+      (List.range (K + 1)).find? (fun k => decide (firstViolation A b (trajectory A b k).2 = none)) := by
+  rw [findIteration, findFirst_eq_find, List.range_eq_range']
 
 def search {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ) (b : Fin m → ℚ)
     (K : ℕ) : Option (Fin n → ℚ) :=
@@ -83,6 +101,7 @@ def search {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ) (b : Fin m → ℚ)
 theorem foundIteration_feasible {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ)
     (b : Fin m → ℚ) (K k : ℕ) (h : findIteration A b K = some k) :
     ∀ i, rowValue A (trajectory A b k).2 i ≤ b i := by
+  rw [findIteration_eq_find] at h
   have hp := List.find?_some h
   have hv : firstViolation A b (trajectory A b k).2 = none := by simpa using hp
   exact (firstViolation_none A b _).mp hv
@@ -90,6 +109,7 @@ theorem foundIteration_feasible {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ)
 theorem noIteration_violated {m n : ℕ} (A : Matrix (Fin m) (Fin n) ℤ)
     (b : Fin m → ℚ) (K : ℕ) (h : findIteration A b K = none) :
     ∀ k ≤ K, firstViolation A b (trajectory A b k).2 ≠ none := by
+  rw [findIteration_eq_find] at h
   have hp := List.find?_eq_none.mp h
   intro k hk
   simpa using hp k (List.mem_range.mpr (by omega))

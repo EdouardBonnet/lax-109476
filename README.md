@@ -108,9 +108,26 @@ then bound each rational entry's registered encoding size by `60 + 6k + 14n`.
 threshold queries with reconstruction to recover an attained coordinate minimum
 exactly, given a denominator bound. `LexicographicSupport` proves that successive
 coordinate minima in standard form have independent support; `RationalMinima`
-proves rational attainment of each coordinate minimum. Intermediate-arithmetic
-bounds, the complete certificate-recovery pipeline, and execution and runtime
-proofs for the registered RAM remain to be formalized.
+proves rational attainment of each coordinate minimum. `LexicographicMinima`
+and `LexicographicBounds` give one determinant cap from the original system for
+every coordinate of the selected point. `PointRecovery`, `IntegerPointRecovery`,
+and `IndexedPointRecovery` implement exact point recovery, including slack
+variables and explicit finite-index equivalences.
+
+`CertificateSystems`, `CertificateSearch`, `WordDecoding`, and `WordSolver`
+complete the executable recovery pipeline. The total word-list function decodes
+the registered input, clears denominators, recovers primal–dual, Farkas, or
+recession witnesses, checks them exactly, and encodes the resulting certificate.
+Its functional correctness is proved for all dimensions and all rational inputs.
+Oversized malformed dimensions are rejected before vector allocation. Search
+stops at a feasible center and at the first valid certificate, without allocating
+the full cut budget or evaluating later certificate systems.
+
+`RationalArithmeticBounds` proves numerator and denominator bounds for exact
+addition, multiplication, inversion, and finite sums, together with their
+encoding bounds. Bounds for complete intermediate computations and execution and runtime proofs for the
+registered RAM remain to be formalized. The functional-correctness proof does
+not discharge the public polynomial-time solver theorem.
 
 The `StandardForm`, `DeterminantBounds`, `SmallFeasiblePoint`,
 `RationalSizeBounds`, `EncodingSize`, `IntegerEncoding`, `IntegerCertificates`,

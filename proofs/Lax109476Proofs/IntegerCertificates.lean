@@ -20,14 +20,14 @@ def BoundedCertificate {m n : ℕ} (B : ℕ) : Certificate m n → Prop
   | .infeasible y => BoundedVector B y
   | .unbounded x d => BoundedVector B x ∧ BoundedVector B d
 
-private def pairMatrix {m n : ℕ} (P : Program ℤ m n) :
+def pairMatrix {m n : ℕ} (P : Program ℤ m n) :
     Matrix (Fin m ⊕ (Fin n ⊕ Bool)) (Fin n ⊕ Fin m) ℤ
   | .inl i => Sum.elim (P.A i) (fun _ => 0)
   | .inr (.inl j) => Sum.elim (fun _ => 0) (fun i => -P.A i j)
   | .inr (.inr false) => Sum.elim P.c (fun i => -P.b i)
   | .inr (.inr true) => Sum.elim (fun j => -P.c j) P.b
 
-private def pairBound {m n : ℕ} (P : Program ℤ m n) :
+def pairBound {m n : ℕ} (P : Program ℤ m n) :
     (Fin m ⊕ (Fin n ⊕ Bool)) → ℤ
   | .inl i => P.b i
   | .inr (.inl j) => -P.c j
@@ -175,13 +175,13 @@ theorem small_infeasibility_certificate {m n : ℕ} (P : Program ℤ m n)
   obtain ⟨yr, hv, hs, _⟩ := normalized_small_infeasibility_certificate P H hH hA hb y hy
   exact ⟨yr, hv, hs⟩
 
-private def rayMatrix {m n : ℕ} (P : Program ℤ m n) :
+def rayMatrix {m n : ℕ} (P : Program ℤ m n) :
     Matrix (Fin m ⊕ (Fin m ⊕ Unit)) (Fin n ⊕ Fin n) ℤ
   | .inl i => Sum.elim (P.A i) (fun _ => 0)
   | .inr (.inl i) => Sum.elim (fun _ => 0) (P.A i)
   | .inr (.inr _) => Sum.elim (fun _ => 0) (fun j => -P.c j)
 
-private def rayBound {m n : ℕ} (P : Program ℤ m n) :
+def rayBound {m n : ℕ} (P : Program ℤ m n) :
     (Fin m ⊕ (Fin m ⊕ Unit)) → ℤ
   | .inl i => P.b i
   | .inr (.inl _) => 0

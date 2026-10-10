@@ -44,3 +44,13 @@ import Lax109476Proofs.BinaryOptimization
 import Lax109476Proofs.CoordinateOptimization
 import Lax109476Proofs.LexicographicSupport
 import Lax109476Proofs.RationalMinima
+import Lax109476Proofs.LexicographicMinima
+import Lax109476Proofs.LexicographicBounds
+import Lax109476Proofs.PointRecovery
+import Lax109476Proofs.IntegerPointRecovery
+import Lax109476Proofs.IndexedPointRecovery
+import Lax109476Proofs.CertificateSystems
+import Lax109476Proofs.CertificateSearch
+import Lax109476Proofs.WordDecoding
+import Lax109476Proofs.WordSolver
+import Lax109476Proofs.RationalArithmeticBounds
