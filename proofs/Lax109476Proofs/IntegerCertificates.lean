@@ -116,12 +116,13 @@ private theorem sum_scale {ι : Type*} [Fintype ι] (a x : ι → ℚ) (t : ℚ)
   ring
 
 /-- Normalize the strict Farkas inequality before compressing its multipliers. -/
-theorem small_infeasibility_certificate {m n : ℕ} (P : Program ℤ m n)
+theorem normalized_small_infeasibility_certificate {m n : ℕ} (P : Program ℤ m n)
     (H : ℕ) (hH : 1 ≤ H) (hA : ∀ i j, (P.A i j).natAbs ≤ H)
     (hb : ∀ i, (P.b i).natAbs ≤ H) (y : Fin m → ℚ)
     (hy : IsInfeasibilityCertificate (rationalProgram P) y) :
     ∃ yr : Fin m → ℚ, IsValidCertificate (rationalProgram P) (.infeasible yr) ∧
-      BoundedCertificate (n := n) (coordinateCap m n H) (.infeasible yr) := by
+      BoundedCertificate (n := n) (coordinateCap m n H) (.infeasible yr) ∧
+        dualValue (rationalProgram P) yr ≤ -1 := by
   let A : Matrix (Fin n ⊕ Unit) (Fin m) ℤ :=
     Sum.elim (fun j i => -P.A i j) (fun _ => P.b)
   let b : (Fin n ⊕ Unit) → ℤ := Sum.elim (fun _ => 0) (fun _ => -1)
@@ -155,7 +156,7 @@ theorem small_infeasibility_certificate {m n : ℕ} (P : Program ℤ m n)
     (2 * (m + n) + 2) hH
     (by simp only [Fintype.card_sum, Fintype.card_fin, Fintype.card_unit]; omega)
     hmat hbound ⟨z, hzpos, hzrows⟩
-  refine ⟨w, ⟨hwpos, ?_, ?_⟩, hwsize⟩
+  refine ⟨w, ⟨hwpos, ?_, ?_⟩, hwsize, ?_⟩
   · intro j
     have h : -columnValue (rationalProgram P) w j ≤ 0 := by
       simpa [A, b, columnValue, rationalProgram, Finset.sum_neg_distrib] using hwrows (.inl j)
@@ -163,6 +164,16 @@ theorem small_infeasibility_certificate {m n : ℕ} (P : Program ℤ m n)
   · have h : dualValue (rationalProgram P) w ≤ -1 := by
       simpa [A, b, dualValue, rationalProgram] using hwrows (.inr ())
     linarith
+  · simpa [A, b, dualValue, rationalProgram] using hwrows (.inr ())
+
+theorem small_infeasibility_certificate {m n : ℕ} (P : Program ℤ m n)
+    (H : ℕ) (hH : 1 ≤ H) (hA : ∀ i j, (P.A i j).natAbs ≤ H)
+    (hb : ∀ i, (P.b i).natAbs ≤ H) (y : Fin m → ℚ)
+    (hy : IsInfeasibilityCertificate (rationalProgram P) y) :
+    ∃ yr : Fin m → ℚ, IsValidCertificate (rationalProgram P) (.infeasible yr) ∧
+      BoundedCertificate (n := n) (coordinateCap m n H) (.infeasible yr) := by
+  obtain ⟨yr, hv, hs, _⟩ := normalized_small_infeasibility_certificate P H hH hA hb y hy
+  exact ⟨yr, hv, hs⟩
 
 private def rayMatrix {m n : ℕ} (P : Program ℤ m n) :
     Matrix (Fin m ⊕ (Fin m ⊕ Unit)) (Fin n ⊕ Fin n) ℤ

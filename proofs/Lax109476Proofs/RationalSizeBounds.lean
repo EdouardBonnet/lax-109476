@@ -37,6 +37,7 @@ theorem clearedNumerator_bound (q : ι → ℚ) (i : ι) :
   simp only [clearedNumerator, Int.natAbs_mul, Int.natAbs_natCast]
   exact Nat.mul_le_mul_left _ (Nat.div_le_self _ _)
 
+omit [Fintype ι] in
 theorem product_le_two_pow_sum_size (s : Finset ι) (f : ι → ℕ) :
     (∏ i ∈ s, f i) ≤ 2 ^ (∑ i ∈ s, Nat.size (f i)) := by
   classical
@@ -74,6 +75,17 @@ theorem size_add_one_le (a : ℕ) : Nat.size (a + 1) ≤ Nat.size a + 1 := by
   rw [pow_succ]
   have h := Nat.lt_size_self a
   have hp : 0 < 2 ^ Nat.size a := by positivity
+  omega
+
+theorem size_add_le (a b : ℕ) : Nat.size (a + b) ≤ Nat.size a + Nat.size b + 1 := by
+  apply Nat.size_le.mpr
+  rw [pow_succ, pow_add]
+  have ha := Nat.lt_size_self a
+  have hb := Nat.lt_size_self b
+  have hpa : 0 < 2 ^ Nat.size a := by positivity
+  have hpb : 0 < 2 ^ Nat.size b := by positivity
+  have h₁ := Nat.le_mul_of_pos_right (2 ^ Nat.size a) hpb
+  have h₂ := Nat.le_mul_of_pos_left (2 ^ Nat.size b) hpa
   omega
 
 theorem size_le_self (a : ℕ) : Nat.size a ≤ a :=

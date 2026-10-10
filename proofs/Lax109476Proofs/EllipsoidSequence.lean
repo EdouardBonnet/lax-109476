@@ -82,11 +82,11 @@ theorem shapes_shrink (n : ℕ) (hn : 2 ≤ n) (a : ℕ → Fin n → ℚ)
   simpa only [v, hid, Matrix.det_one, Real.sqrt_one, mul_one] using h
 
 /-- Every point retained by all supplied central cuts stays inside the stored ellipsoids. -/
-theorem preserves_points (n : ℕ) (hn : 2 ≤ n) (a : ℕ → Fin n → ℚ)
+theorem preserves_points_up_to (n : ℕ) (hn : 2 ≤ n) (a : ℕ → Fin n → ℚ)
     (ha : ∀ k, 1 ≤ realVector (a k) ⬝ᵥ realVector (a k)) (c₀ : Fin n → ℚ)
     (x : Fin n → ℝ) (hx : (x - realVector c₀) ⬝ᵥ (x - realVector c₀) ≤ 1)
-    (hcut : ∀ k, realVector (a k) ⬝ᵥ (x - realVector (centers n a c₀ k)) ≤ 0)
-    (k : ℕ) :
+    (k : ℕ)
+    (hcut : ∀ j < k, realVector (a j) ⬝ᵥ (x - realVector (centers n a c₀ j)) ≤ 0) :
     (x - realVector (centers n a c₀ k)) ⬝ᵥ
       ((realShape (shapes n a k))⁻¹ *ᵥ (x - realVector (centers n a c₀ k))) ≤ 1 := by
   induction k with
@@ -98,7 +98,18 @@ theorem preserves_points (n : ℕ) (hn : 2 ≤ n) (a : ℕ → Fin n → ℚ)
   | succ k ih =>
       have hi := shapes_invariant n hn a ha k
       exact uniform_roundedStep_contains n hn (shapes n a k) hi.1 (a k) (centers n a c₀ k)
-        (ha k) (2 * k) (2 * n + 4) (fun y => (hi.2 y).1) x ih (hcut k)
+        (ha k) (2 * k) (2 * n + 4) (fun y => (hi.2 y).1) x
+        (ih (fun j hj => hcut j (by omega))) (hcut k (by omega))
+
+/-- The unrestricted cut hypothesis is a convenient corollary of finite-prefix containment. -/
+theorem preserves_points (n : ℕ) (hn : 2 ≤ n) (a : ℕ → Fin n → ℚ)
+    (ha : ∀ k, 1 ≤ realVector (a k) ⬝ᵥ realVector (a k)) (c₀ : Fin n → ℚ)
+    (x : Fin n → ℝ) (hx : (x - realVector c₀) ⬝ᵥ (x - realVector c₀) ≤ 1)
+    (hcut : ∀ k, realVector (a k) ⬝ᵥ (x - realVector (centers n a c₀ k)) ≤ 0)
+    (k : ℕ) :
+    (x - realVector (centers n a c₀ k)) ⬝ᵥ
+      ((realShape (shapes n a k))⁻¹ *ᵥ (x - realVector (centers n a c₀ k))) ≤ 1 :=
+  preserves_points_up_to n hn a ha c₀ x hx k (fun j _ => hcut j)
 
 /-- The chosen grid denominator has a linear bit length in iteration and dimension. -/
 theorem sequence_grid_size (n k : ℕ) :

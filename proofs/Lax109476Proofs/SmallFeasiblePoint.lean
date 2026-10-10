@@ -43,6 +43,7 @@ theorem integer_system_coordinate_bound (A : Matrix ι ι ℤ) (b : ι → ℤ)
   simp only [Matrix.updateCol_apply]
   split_ifs <;> first | exact hb i | exact hA i k
 
+omit [Fintype ι] [DecidableEq ι] in
 /-- Gram entries and right-hand-side entries grow by at most the number of
 original rows times the square of the original integer magnitude bound. -/
 theorem integer_gram_entry_bound (C : Matrix κ ι ℤ) (b : κ → ℤ)

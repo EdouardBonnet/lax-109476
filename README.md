@@ -84,13 +84,33 @@ retained by the supplied cuts. At iteration `k`, the grid denominator has
 `2k + 3n + 10` bits. After `4(n+1)(Bn+1)` cuts, the square-root determinant is
 below the threshold `2^(-Bn)`.
 
-These proofs assume dimension at least two and externally supplied cut normals
-whose squared lengths are at least one. They do not construct the LP separation
-routine, supply a rational-polyhedron feasibility radius, or bound the complete
-LP algorithm's runtime. The grid-size result bounds the denominator, not all
-state encodings or intermediate arithmetic. A feasibility radius for the
-relaxed LP, exact certificate recovery, the zero- and one-dimensional
-algorithmic cases, and uniform RAM execution remain to be formalized.
+The `Relaxation`, `EllipsoidBall`, `EllipsoidTermination`, `RationalSeparation`,
+`EllipsoidSearch`, `NormalizedFeasibility`, `IntegerFeasibilityDecision`,
+`FeasibilityPadding`, `IterationBudget`, and `RationalFeasibilityDecision`
+modules connect these updates to a computable exact feasibility decision.
+The separation routine scans integer rows with rational comparisons; every
+nonzero selected row meets the required normal-length bound. Bounded Farkas
+multipliers give a relaxation gap, and bounded feasible witnesses give a ball
+inside the normalized relaxed LP. Ball containment supplies the determinant
+lower bound needed for finite termination. Two dummy variables handle all
+input dimensions. The cut budget is at most `640000 * (L + 1)^4`.
+
+The `RationalReconstruction` module supplies a computable continued-fraction
+scan with a proved exact interval-reconstruction guarantee. Two successive
+tails halve the denominator, so the scan examines only twice the approximation's
+denominator bit length. Distinct rationals with denominator at most `B` are
+separated by at least `1/B²`.
+
+The `EllipsoidStateSize` module bounds each stored shape entry by `4^k` and
+each center coordinate by `2^(k+2)`. The shape and center grid representations
+then bound each rational entry's registered encoding size by `60 + 6k + 14n`.
+`BinaryOptimization` and `CoordinateOptimization` combine logarithmically many
+threshold queries with reconstruction to recover an attained coordinate minimum
+exactly, given a denominator bound. `LexicographicSupport` proves that successive
+coordinate minima in standard form have independent support; `RationalMinima`
+proves rational attainment of each coordinate minimum. Intermediate-arithmetic
+bounds, the complete certificate-recovery pipeline, and execution and runtime
+proofs for the registered RAM remain to be formalized.
 
 The `StandardForm`, `DeterminantBounds`, `SmallFeasiblePoint`,
 `RationalSizeBounds`, `EncodingSize`, `IntegerEncoding`, `IntegerCertificates`,

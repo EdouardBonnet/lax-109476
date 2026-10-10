@@ -54,7 +54,7 @@ theorem determinant_bound {ι : Type*} [Fintype ι] [DecidableEq ι]
         congr 1
         funext σ
         have hs : |(Equiv.Perm.sign σ : ℤ)| = 1 := by
-          simpa using (abs_unit_intCast (α := ℤ) (Equiv.Perm.sign σ))
+          exact Int.isUnit_iff_abs_eq.mp (Equiv.Perm.sign σ).isUnit
         rw [abs_mul, hs, one_mul, Finset.abs_prod]
       _ ≤ ∑ _σ : Equiv.Perm ι, ∏ _i : ι, (H : ℤ) := by
         apply Finset.sum_le_sum
