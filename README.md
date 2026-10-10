@@ -158,6 +158,12 @@ the quadratic-form factors, and the dyadic precision schedule.
 through rational-value specifications. `RamCenterCoordinate` and
 `RamCenterUpdate` verify the complete rounded center-update loop, its relation
 to the mathematical ellipsoid center, and a polynomial instruction bound.
+`RamShapeCoordinate` and `RamShapeUpdate` verify the full rounded shape-update
+loop, including diagonal correction and inflation, its equality with the
+mathematical update, and a polynomial instruction bound.
+`RamEllipsoidCoefficients` verifies initialization and storage of all five
+step coefficients, derives their rational height bounds, and bounds the
+instruction count by a polynomial.
 `RecoveryArithmeticBounds` and `SolverOutputBounds` bound the coordinates
 actually produced by recovery and prove the cubic size bound for the returned
 certificate. `DecodingSizeBounds` proves that decoding noncanonical input

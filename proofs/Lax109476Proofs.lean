@@ -82,3 +82,6 @@ import Lax109476Proofs.RamMatrixStorage
 import Lax109476Proofs.RamFractionInterface
 import Lax109476Proofs.RamCenterCoordinate
 import Lax109476Proofs.RamCenterUpdate
+import Lax109476Proofs.RamShapeCoordinate
+import Lax109476Proofs.RamShapeUpdate
+import Lax109476Proofs.RamEllipsoidCoefficients
