@@ -110,3 +110,11 @@ import Lax109476Proofs.RamReadHeader
 import Lax109476Proofs.RamReadBlock
 import Lax109476Proofs.RamReadBody
 import Lax109476Proofs.RamDecoder
+import Lax109476Proofs.RamEncodedSize
+import Lax109476Proofs.RamDenominatorProduct
+import Lax109476Proofs.RamSizeBlock
+import Lax109476Proofs.RamDenominatorBlock
+import Lax109476Proofs.RamStoredProgram
+import Lax109476Proofs.RamProgramSize
+import Lax109476Proofs.RamProgramDenominator
+import Lax109476Proofs.RamScaleCoordinate

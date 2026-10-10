@@ -224,6 +224,14 @@ bound is `4 * (L + 2)` before compiler-layout allowance, and its instruction
 bound is `(36 * (L + 1) + 115) * (L² + 4L + 3) + 127` for input bit size `L`.
 The decoder is proved to load exactly the registered LP encoding in every
 dimension and at every larger word width.
+`RamEncodedSize`, `RamSizeBlock`, and `RamProgramSize` compute the canonical
+LP's registered binary size using bounded bit-counting loops. The
+`RamDenominatorProduct`, `RamDenominatorBlock`, and `RamProgramDenominator`
+modules compute exactly its common denominator, including empty products,
+while preserving the loaded program. `RamStoredProgram` supplies the shared
+storage invariant. `RamScaleCoordinate` verifies the per-coordinate rational
+scaling operation needed to clear denominators into integer data.
+
 
 The `StandardForm`, `DeterminantBounds`, `SmallFeasiblePoint`,
 `RationalSizeBounds`, `EncodingSize`, `IntegerEncoding`, `IntegerCertificates`,
