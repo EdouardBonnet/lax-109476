@@ -72,3 +72,5 @@ import Lax109476Proofs.RamPrimitiveBounds
 import Lax109476Proofs.RamRationalArrays
 import Lax109476Proofs.RamFrame
 import Lax109476Proofs.RamDotProduct
+import Lax109476Proofs.RamMatrixRows
+import Lax109476Proofs.RamSeparation

@@ -143,7 +143,10 @@ cap, and `RamRationalArrays` verifies bounds-checked rational loads and
 canonical stores using three arrays for signs, numerators, and denominators.
 `RamDotProduct` verifies the full rational dot-product loop, including empty
 vectors, preservation of the input arrays, and an instruction bound polynomial
-in vector length and operand bit length.
+in vector length and operand bit length. `RamMatrixRows` verifies row-major
+slices, bounded row addresses, and matrix-row dot products. `RamSeparation`
+verifies a complete scan whose numeric result is the same first violated
+inequality as mathematical separation, with a polynomial instruction bound.
 `RecoveryArithmeticBounds` and `SolverOutputBounds` bound the coordinates
 actually produced by recovery and prove the cubic size bound for the returned
 certificate. `DecodingSizeBounds` proves that decoding noncanonical input
