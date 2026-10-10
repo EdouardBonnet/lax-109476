@@ -66,3 +66,5 @@ import Lax109476Proofs.RecoveryArithmeticBounds
 import Lax109476Proofs.SolverOutputBounds
 import Lax109476Proofs.DecodingSizeBounds
 import Lax109476Proofs.WordSolverSize
+import Lax109476Proofs.RamRounding
+import Lax109476Proofs.RamEncoding

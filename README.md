@@ -135,6 +135,9 @@ their costs are linear in bit length. `RamRational` verifies signed addition,
 multiplication, and inversion with reduced numerators and denominators.
 `RamComparison` verifies exact order comparisons, including either sign of
 zero, and `RamBitLength` verifies a linear-time bit-counting loop.
+`RamRounding` connects grid flooring and upper square-root approximation to
+verified integer division, GCD, and square-root instructions. `RamEncoding`
+verifies canonical rational output, including clearing the sign of zero.
 `RecoveryArithmeticBounds` and `SolverOutputBounds` bound the coordinates
 actually produced by recovery and prove the cubic size bound for the returned
 certificate. `DecodingSizeBounds` proves that decoding noncanonical input
