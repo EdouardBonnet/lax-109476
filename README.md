@@ -28,20 +28,19 @@ over real variables, with rational output certificates.
 | Exact rational certificate existence | Rationalize a matching primal–dual pair or normalized direction; use rational Farkas for infeasibility | Rational feasible-point existence; strong duality; improving-direction existence |
 | Rational certificate soundness | Cast exact checks into the reals and verify all three outcomes | Weak duality; Farkas soundness; improving-direction soundness |
 | Polynomial RAM output size | At most one output word per instruction; bounded bit size per word | None |
-| Polynomial-size rational certificates | Bound the encoding of the exact solver's output | Exact polynomial-time solver; polynomial RAM output size |
+| Polynomial-size rational certificates | Clear denominators, choose independent supports, and bound Gram determinants | Exact rational certificate existence |
 | Certified polynomial-time optimization | Reuse the solver's output and apply soundness | Exact polynomial-time solver; rational certificate soundness |
 
 The real LP duality and certificate-soundness chain is now fully proved:
 the elimination proof closes Farkas' lemma, and Farkas' lemma closes primal
 attainment and optimal dual multipliers, hence strong duality.
-All three rational certificate outcomes also have a proved existence theorem
-independent of the solver. Its proof supplies no polynomial encoding-size bound.
+All three rational certificate outcomes have proved existence and polynomial
+encoding-size bounds independent of the solver. The explicit bound is
+`512 * (L + 1)^3`, where `L` is the registered binary input size.
 
-The exact polynomial-time solver is the remaining open foundation. The
-polynomial-size certificate result and certified optimization have conditional
-proofs depending on this solver. These statements remain unproved in the
-network until the solver is proved. The certificate-size proof is a corollary
-of polynomial output size; it is not an independent determinant-bound proof.
+The exact polynomial-time solver is the remaining open foundation. Certified
+optimization has a conditional proof depending on this solver and remains
+unproved in the network until the solver is proved.
 
 Finishing the solver requires a formal polynomial-time LP algorithm, exact
 rational arithmetic and rounding bounds, exact certificate recovery, and
@@ -89,9 +88,19 @@ These proofs assume dimension at least two and externally supplied cut normals
 whose squared lengths are at least one. They do not construct the LP separation
 routine, supply a rational-polyhedron feasibility radius, or bound the complete
 LP algorithm's runtime. The grid-size result bounds the denominator, not all
-state encodings or intermediate arithmetic. LP feasibility and certificate-size
-bounds independent of a solver, exact certificate recovery, the zero- and
-one-dimensional cases, and uniform RAM execution remain to be formalized.
+state encodings or intermediate arithmetic. A feasibility radius for the
+relaxed LP, exact certificate recovery, the zero- and one-dimensional
+algorithmic cases, and uniform RAM execution remain to be formalized.
+
+The `StandardForm`, `DeterminantBounds`, `SmallFeasiblePoint`,
+`RationalSizeBounds`, `EncodingSize`, `IntegerEncoding`, `IntegerCertificates`,
+and `SmallCertificates` modules prove the independent certificate-size bound.
+Minimal-support conic representations have independent columns, and Cramer's
+rule on their integer Gram matrix bounds every reduced coordinate. Clearing
+denominators uses their total encoded size. Optimality witnesses are compressed
+together with equality of objectives; Farkas and recession witnesses first
+normalize the strict inequality. This argument permits zero dimensions and
+lower-dimensional feasible sets. Its public dependency is certificate existence.
 
 ## Exact computation
 

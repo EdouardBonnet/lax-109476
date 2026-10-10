@@ -1,13 +1,10 @@
 import Lax109476.RamOutputSize
-import Lax109476.SmallCertificates
-import Lax109476.PolynomialTimeSolver
 import Mathlib.Data.Nat.Size
 import Mathlib.Tactic
 
 namespace Lax109476Proofs.OutputSize
 
 open Lax808846.Ram Lax759944.RamPolytime Lax759944.BinaryWordEncoding
-open Lax109476.LinearProgram Lax109476.RationalCertificates Lax109476.RationalEncoding
 
 private theorem effect_output_length (w : ℕ) (i : Instr) (s s' : State)
     (h : i.effect w s = some s') : s'.out.length ≤ s.out.length + 1 := by
@@ -111,28 +108,5 @@ theorem ram_polynomial_output_size :
     _ = (timeBound * (wordBound + 1)).eval (bitSize x) := by simp
     _ ≤ C * (bitSize x + 1) ^ k := hpoly _
 
-/--
----
-conclusion: Lax109476.SmallCertificates.exists_polynomial_size_certificate
----
-Take the certificate returned by the exact polynomial-time solver. The
-machine's output-size theorem bounds its encoding by a polynomial in the
-input encoding size. This is a conditional proof using the solver theorem;
-it is not an independent determinant-bound proof of small certificates.
--/
-theorem polynomial_size_certificates :
-    ∃ C k : ℕ, 0 < C ∧ ∀ (m n : ℕ) (P : Program ℚ m n),
-      ∃ certificate : Certificate m n, IsValidCertificate P certificate ∧
-        bitSize (encodeCertificate certificate) ≤ C * (bitSize (encodeProgram P) + 1) ^ k := by
-  obtain ⟨solve, hruntime, hsolve⟩ :=
-    Lax109476.PolynomialTimeSolver.exists_exact_polynomial_time_solver
-  obtain ⟨C, k, hC, hsize⟩ :=
-    Lax109476.RamOutputSize.exists_polynomial_output_bound solve hruntime
-  refine ⟨C, k, hC, ?_⟩
-  intro m n P
-  obtain ⟨certificate, hout, hvalid⟩ := hsolve m n P
-  refine ⟨certificate, hvalid, ?_⟩
-  rw [← hout]
-  exact hsize _
 
 end Lax109476Proofs.OutputSize
