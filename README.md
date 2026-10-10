@@ -208,6 +208,16 @@ computations and execution and runtime proofs for the
 registered RAM remain to be formalized. The functional-correctness proof does
 not discharge the public polynomial-time solver theorem.
 
+
+`RamInput`, `RamReadFraction`, `RamReadArray`, and `RamReadMatrix` verify
+length-prefixed input reads, exact rational normalization, and uniform array
+loops with polynomial instruction bounds. The reader handles truncated triples,
+invalid signs and zero denominators, retains an earlier invalidity flag, and
+uses a canonical zero placeholder after failure so subsequent stores remain
+bounded. Successful vector parses match the functional decoder, and row-major
+matrix input matches the separation oracle's flat storage, including empty
+dimensions. Execution tests use the registered RAM directly.
+
 The `StandardForm`, `DeterminantBounds`, `SmallFeasiblePoint`,
 `RationalSizeBounds`, `EncodingSize`, `IntegerEncoding`, `IntegerCertificates`,
 and `SmallCertificates` modules prove the independent certificate-size bound.
