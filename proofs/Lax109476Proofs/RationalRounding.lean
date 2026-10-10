@@ -81,35 +81,48 @@ private theorem abs_le_num (q : ℚ) : |q| ≤ (q.num.natAbs : ℚ) := by
   apply (div_le_iff₀ hden).mpr
   simpa using mul_le_mul_of_nonneg_left hden₁ (Nat.cast_nonneg q.num.natAbs)
 
-/-- The integer numerator before grid reduction has a polynomial bit bound. -/
-theorem roundDown_floor_bound (q : ℚ) (D : ℕ) :
-    (Int.floor (q * D)).natAbs ≤ q.num.natAbs * D + 1 := by
+/-- A magnitude bound controls the grid numerator independently of the input denominator. -/
+theorem roundDown_floor_magnitude_bound (q : ℚ) (M D : ℕ) (hq : |q| ≤ M) :
+    (Int.floor (q * D)).natAbs ≤ M * D + 1 := by
   let k := Int.floor (q * D)
-  have hab := abs_le.mp (abs_le_num q)
+  have hab := abs_le.mp hq
   have hD : (0 : ℚ) ≤ D := Nat.cast_nonneg _
   have hupper := mul_le_mul_of_nonneg_right hab.2 hD
   have hlower := mul_le_mul_of_nonneg_right hab.1 hD
   have hfloor : (k : ℚ) ≤ q * D := Int.floor_le _
   have hfloor' : q * D < (k : ℚ) + 1 := Int.lt_floor_add_one _
-  have hk : |(k : ℚ)| ≤ (q.num.natAbs : ℚ) * D + 1 := by
+  have hk : |(k : ℚ)| ≤ (M : ℚ) * D + 1 := by
     apply abs_le.mpr
     constructor <;> linarith
-  have hk' : (k.natAbs : ℚ) ≤ ((q.num.natAbs * D + 1 : ℕ) : ℚ) := by
+  have hk' : (k.natAbs : ℚ) ≤ ((M * D + 1 : ℕ) : ℚ) := by
     simpa only [Nat.cast_natAbs, Int.cast_abs, Nat.cast_add, Nat.cast_mul,
       Nat.cast_one] using hk
   exact Nat.cast_le.mp hk'
+
+/-- The integer numerator before grid reduction has a polynomial bit bound. -/
+theorem roundDown_floor_bound (q : ℚ) (D : ℕ) :
+    (Int.floor (q * D)).natAbs ≤ q.num.natAbs * D + 1 :=
+  roundDown_floor_magnitude_bound q q.num.natAbs D (abs_le_num q)
+
+/-- Rounding restores a size bound depending only on magnitude and grid precision. -/
+theorem roundDown_encoding_magnitude_bound (q : ℚ) (M D : ℕ) (hD : 0 < D)
+    (hq : |q| ≤ M) :
+    Lax759944.BinaryWordEncoding.bitSize
+      (Lax109476.RationalEncoding.encodeRational (roundDown q D)) ≤
+        5 + Nat.size M + 2 * Nat.size D := by
+  have hgrid := grid_encoding_bound (Int.floor (q * D)) D hD
+  have hfloor := Nat.size_le_size (roundDown_floor_magnitude_bound q M D hq)
+  have h₁ := size_add_one_le (M * D)
+  have h₂ := size_mul_le M D
+  unfold roundDown
+  omega
 
 /-- The encoded rounded rational uses linearly many bits in numerator and precision size. -/
 theorem roundDown_encoding_bound (q : ℚ) (D : ℕ) (hD : 0 < D) :
     Lax759944.BinaryWordEncoding.bitSize
       (Lax109476.RationalEncoding.encodeRational (roundDown q D)) ≤
         5 + Nat.size q.num.natAbs + 2 * Nat.size D := by
-  have hgrid := grid_encoding_bound (Int.floor (q * D)) D hD
-  have hfloor := Nat.size_le_size (roundDown_floor_bound q D)
-  have h₁ := size_add_one_le (q.num.natAbs * D)
-  have h₂ := size_mul_le q.num.natAbs D
-  unfold roundDown
-  omega
+  exact roundDown_encoding_magnitude_bound q q.num.natAbs D hD (abs_le_num q)
 
 /-- Integer square-root rounding also has a linear encoding-size bound. -/
 theorem sqrtUpper_encoding_bound (q : ℚ) (D : ℕ) (hD : 0 < D) :

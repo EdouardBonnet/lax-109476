@@ -52,16 +52,29 @@ added to discharge this obligation.
 
 Internal progress toward an ellipsoid implementation is included in
 `proofs/Lax109476Proofs/EllipsoidStep.lean` and
-`proofs/Lax109476Proofs/RationalRounding.lean`. The first proves the normalized
+`proofs/Lax109476Proofs/RationalRounding.lean`,
+`proofs/Lax109476Proofs/EllipsoidRounding.lean`, and
+`proofs/Lax109476Proofs/EllipsoidBounds.lean`. The first proves the normalized
 central-cut matrix's positive definiteness, inverse, containment, and determinant
 factor in dimensions at least two. It bounds the square root of that determinant
 factor, allows a small uniform enlargement, and proves an iterated contraction
 bound. The second defines computable rational grid rounding and an
 integer-square-root approximation, proves their real error bounds, and bounds
-their encodings using the registered binary-word encoding. These internal
-lemmas are not connected to a solver proof and do not make the solver node
-proved. Shape-matrix rounding, global precision and feasibility bounds, and
-uniform RAM execution remain to be formalized.
+their encodings using the registered binary-word encoding. A magnitude-based
+encoding bound controls a rounded value independently of its original denominator.
+The rounding module proves quadratic-form error bounds, inverse-form
+antitonicity, and preservation of positive definiteness and containment after
+entrywise rounding with a diagonal allowance. It also quantifies the enlargement
+needed for a displaced center. The bounds module defines the rational update
+for a general positive definite shape, proves its inverse, containment, determinant
+factor, and conditioning bounds, and connects the update to shape rounding.
+It gives an iterated conditioning bound and a dyadic precision schedule whose
+denominator bit length is linear in the conditioning exponent and dimension.
+These internal lemmas are not connected to a solver proof and do not make the
+solver node proved. A complete rational center update and its precision schedule,
+termination and feasibility bounds, exact recovery of certificates, and uniform
+RAM execution remain to be formalized. The conditioning induction assumes the
+per-step bounds; it does not yet verify a complete rounded iteration.
 
 ## Exact computation
 

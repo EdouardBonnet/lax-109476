@@ -10,6 +10,8 @@ import Lax109476Proofs.Elimination.FourierMotzkin
 import Lax109476Proofs.Elimination.Farkas1
 import Lax109476Proofs.EllipsoidStep
 import Lax109476Proofs.RationalRounding
+import Lax109476Proofs.EllipsoidRounding
+import Lax109476Proofs.EllipsoidBounds
 import Lax109476Proofs.Recession
 import Lax109476Proofs.RationalFeasibility
 import Lax109476Proofs.CertificateExistence
