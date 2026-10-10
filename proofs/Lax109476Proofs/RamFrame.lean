@@ -23,4 +23,14 @@ theorem spec_with_fields {B K : ℕ} {c : Com} {P : Env → Prop} {Q : Env → E
   funext a
   exact hr.frame_arr a (by simp [ha])
 
+theorem spec_with_write_frame {B K : ℕ} {c : Com} {P : Env → Prop} {Q : Env → Env → Prop}
+    (fields : List String) (h : Spec B P c Q K)
+    (hf : ∀ x ∈ fields, x ∉ c.wvars) :
+    Spec B P c (fun σ τ => Q σ τ ∧ FieldsAgree fields σ τ ∧
+      ∀ a ∉ c.warrs, τ.arrs a = σ.arrs a) K := by
+  intro σ hσ
+  obtain ⟨τ, hr, hτ⟩ := h σ hσ
+  exact ⟨τ, hr, hτ, fun x hx => hr.frame_var x (hf x hx),
+    fun a ha => hr.frame_arr a ha⟩
+
 end Lax109476Proofs.RamFrame

@@ -74,3 +74,9 @@ import Lax109476Proofs.RamFrame
 import Lax109476Proofs.RamDotProduct
 import Lax109476Proofs.RamMatrixRows
 import Lax109476Proofs.RamSeparation
+import Lax109476Proofs.RamZeroArray
+import Lax109476Proofs.RamMatrixVector
+import Lax109476Proofs.RamEllipsoidForm
+import Lax109476Proofs.RamEllipsoidScalars
+import Lax109476Proofs.RamMatrixStorage
+import Lax109476Proofs.RamFractionInterface

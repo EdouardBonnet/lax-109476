@@ -147,6 +147,15 @@ in vector length and operand bit length. `RamMatrixRows` verifies row-major
 slices, bounded row addresses, and matrix-row dot products. `RamSeparation`
 verifies a complete scan whose numeric result is the same first violated
 inequality as mathematical separation, with a polynomial instruction bound.
+`RamZeroArray` verifies rational-array initialization, and `RamMatrixVector`
+verifies the complete matrix-vector product used by ellipsoid updates, including
+output storage reuse and a polynomial instruction bound. `RamEllipsoidForm`
+verifies the stored quadratic form and its polynomial instruction bound.
+`RamEllipsoidScalars` verifies the dimension factor, rational inflation factor,
+the quadratic-form factors, and the dyadic precision schedule.
+`RamMatrixStorage` connects flat array entries to matrix rows, and
+`RamFractionInterface` exposes checked arithmetic and signed subtraction
+through rational-value specifications.
 `RecoveryArithmeticBounds` and `SolverOutputBounds` bound the coordinates
 actually produced by recovery and prove the cubic size bound for the returned
 certificate. `DecodingSizeBounds` proves that decoding noncanonical input
