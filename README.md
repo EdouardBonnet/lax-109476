@@ -23,6 +23,9 @@ over real variables, with rational output certificates.
 | Primal attainment | Apply Farkas to the system attaining the finite supremum | Farkas certificate existence; Farkas soundness; weak duality |
 | Strong duality | Obtain an attained primal optimizer and matching multipliers | Primal attainment; optimal dual multipliers |
 | Improving-direction soundness | Move beyond any proposed bound along a feasible ray | None |
+| Improving-direction existence | Apply Farkas to the normalized direction system; a contrary certificate gives a dual upper bound | Farkas certificate existence; weak duality |
+| Rational feasible-point existence | Eliminate over the rationals and cast a contrary Farkas certificate into the reals | Farkas certificate soundness |
+| Exact rational certificate existence | Rationalize a matching primal–dual pair or normalized direction; use rational Farkas for infeasibility | Rational feasible-point existence; strong duality; improving-direction existence |
 | Rational certificate soundness | Cast exact checks into the reals and verify all three outcomes | Weak duality; Farkas soundness; improving-direction soundness |
 | Polynomial RAM output size | At most one output word per instruction; bounded bit size per word | None |
 | Polynomial-size rational certificates | Bound the encoding of the exact solver's output | Exact polynomial-time solver; polynomial RAM output size |
@@ -31,6 +34,8 @@ over real variables, with rational output certificates.
 The real LP duality and certificate-soundness chain is now fully proved:
 the elimination proof closes Farkas' lemma, and Farkas' lemma closes primal
 attainment and optimal dual multipliers, hence strong duality.
+All three rational certificate outcomes also have a proved existence theorem
+independent of the solver. Its proof supplies no polynomial encoding-size bound.
 
 The exact polynomial-time solver is the remaining open foundation. The
 polynomial-size certificate result and certified optimization have conditional
@@ -44,6 +49,19 @@ execution and runtime proofs for the registered RAM (or a proved reduction
 through an equivalent computational model). Fourier–Motzkin elimination
 supplies no polynomial runtime bound. No new algorithmic axiom has been
 added to discharge this obligation.
+
+Internal progress toward an ellipsoid implementation is included in
+`proofs/Lax109476Proofs/EllipsoidStep.lean` and
+`proofs/Lax109476Proofs/RationalRounding.lean`. The first proves the normalized
+central-cut matrix's positive definiteness, inverse, containment, and determinant
+factor in dimensions at least two. It bounds the square root of that determinant
+factor, allows a small uniform enlargement, and proves an iterated contraction
+bound. The second defines computable rational grid rounding and an
+integer-square-root approximation, proves their real error bounds, and bounds
+their encodings using the registered binary-word encoding. These internal
+lemmas are not connected to a solver proof and do not make the solver node
+proved. Shape-matrix rounding, global precision and feasibility bounds, and
+uniform RAM execution remain to be formalized.
 
 ## Exact computation
 
@@ -91,13 +109,16 @@ Linear and Integer Programming* (1986), particularly the duality and
 rational-polyhedron results. The polynomial-time solvability claim is the
 classical rational LP theorem originating with
 [Khachiyan (1979)](https://www.mathnet.ru/eng/dan42319), with exact outcome
-certificates. No ellipsoid implementation is included.
+certificates. The central-cut calculations follow
+[Goemans' ellipsoid-method lecture](https://ocw.mit.edu/courses/6-854j-advanced-algorithms-fall-2008/bc621c481eecc9cb9c645eb44538a7f3_lect9_26.pdf).
+The implementation is incomplete as described above.
 
 The elimination and unrestricted-variable Farkas proofs adapt
 [Jyotirmoy Bhattacharya's `farkas_lean`](https://github.com/jmoy/farkas_lean)
 at revision `30c319dd52ca89cfa82a68352b1f39f4f3026fc2`. The adaptation
-specializes the Farkas induction to real coefficients, exposes the elimination
+uses the Farkas induction over ordered fields, exposes the real elimination
 step in the Lax proof network, and updates the proof to the pinned toolchain.
+The rational instance uses the same proved elimination construction directly.
 Each adapted source retains the original MIT license; see
 [the attribution and license](THIRD_PARTY_LICENSES.md).
 

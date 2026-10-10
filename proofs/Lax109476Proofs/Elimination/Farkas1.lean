@@ -31,7 +31,7 @@ We prove it using our Fourier-Motzkin elimination theorem.
 
 namespace Lax109476Proofs.Elimination
 
-local notation "F" => ℝ
+variable {F : Type} [Field F] [LinearOrder F] [IsStrictOrderedRing F]
 variable {m : Type} [Fintype m]
 
 /-!
@@ -59,7 +59,10 @@ private theorem liftDual_of_fourierMotzkin {κ : Type*} [Fintype κ] {n : ℕ}
   (∀ j, 0 ≤ y j) ∧ (y ᵥ* A = 0) ∧ (y ⬝ᵥ b < 0) := by
   have hy_nonneg : ∀ j, 0 ≤ (M.transpose.mulVec y') j := by
     intro j
-    simpa [Matrix.mulVec] using dotProduct_nonneg_of_nonneg (hMt_nonneg j) hy'_nonneg
+    simp only [Matrix.mulVec, dotProduct]
+    apply Finset.sum_nonneg
+    intro i _
+    exact mul_nonneg (hMt_nonneg j i) (hy'_nonneg i)
   have hy'_Acast : y' ᵥ* ((M * A).submatrix id Fin.castSucc) = 0 := by
     have hAred_eq : M * (A.submatrix id Fin.castSucc) = (M * A).submatrix id Fin.castSucc := by
       simpa using
@@ -95,7 +98,14 @@ private theorem liftDual_of_fourierMotzkin {κ : Type*} [Fintype κ] {n : ℕ}
 ## Farkas' Lemma
 -/
 
-theorem Farkas1Exhaust {n : ℕ} (A : Matrix m (Fin n) F) (b : m → F) :
+theorem Farkas1ExhaustWith
+    (eliminate : ∀ (m : Type) [Fintype m] (n : ℕ)
+      (A : Matrix m (Fin (n + 1)) F) (b : m → F),
+      ∃ κ : Type, ∃ _ : Fintype κ, ∃ M : Matrix κ m F,
+        (∀ i j, 0 ≤ M i j) ∧ (∀ i, (M * A) i (Fin.last n) = 0) ∧
+        ((∃ x : Fin (n + 1) → F, A.mulVec x ≤ b) ↔
+          ∃ x' : Fin n → F, (M * (A.submatrix id Fin.castSucc)).mulVec x' ≤ M.mulVec b))
+    {n : ℕ} (A : Matrix m (Fin n) F) (b : m → F) :
   Farkas1Primal A b ∨ Farkas1Dual A b := by
   induction n generalizing m b with
   | zero =>
@@ -126,7 +136,7 @@ theorem Farkas1Exhaust {n : ℕ} (A : Matrix m (Fin n) F) (b : m → F) :
       by_cases hP : Farkas1Primal A b
       · exact Or.inl hP
       · right
-        rcases Lax109476.FourierMotzkin.exists_elimination m n A b with ⟨κ, _, M, hM_nonneg, hM_last, hFM⟩
+        rcases eliminate m n A b with ⟨κ, _, M, hM_nonneg, hM_last, hFM⟩
         let Ared : Matrix κ (Fin n) F := M * (A.submatrix id Fin.castSucc)
         let bred : κ → F := M.mulVec b
         have hFM' : Farkas1Primal A b ↔ Farkas1Primal (m := κ) Ared bred := by
@@ -149,4 +159,15 @@ theorem Farkas1Exhaust {n : ℕ} (A : Matrix m (Fin n) F) (b : m → F) :
           simpa [Ared, bred] using
             (liftDual_of_fourierMotzkin A b M hM_last hMt_nonneg y' hy'_nonneg hy'_Ared hy'_bred)
         exact hdual_lift
+
+/-- The real alternative uses the registered elimination statement, retaining
+that dependency in the submission's proof network. -/
+theorem Farkas1Exhaust {n : ℕ} (A : Matrix m (Fin n) ℝ) (b : m → ℝ) :
+    Farkas1Primal A b ∨ Farkas1Dual A b :=
+  Farkas1ExhaustWith Lax109476.FourierMotzkin.exists_elimination A b
+
+/-- Rational elimination is proved directly by the generic elimination proof. -/
+theorem Farkas1ExhaustRat {n : ℕ} (A : Matrix m (Fin n) ℚ) (b : m → ℚ) :
+    Farkas1Primal A b ∨ Farkas1Dual A b :=
+  Farkas1ExhaustWith (fun _ _ _ A b => Fourier_Motzkin A b) A b
 end Lax109476Proofs.Elimination

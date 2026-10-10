@@ -11,9 +11,12 @@ import Lax109476.FarkasAlternative
 import Lax109476.OptimalDualMultipliers
 import Lax109476.RecessionDirection
 import Lax109476.RecessionSoundness
+import Lax109476.RecessionExistence
 import Lax109476.RationalCertificates
+import Lax109476.RationalFeasibility
 import Lax109476.RationalEncoding
 import Lax109476.CertificateSoundness
+import Lax109476.CertificateExistence
 import Lax109476.SmallCertificates
 import Lax109476.PolynomialTimeSolver
 import Lax109476.CertifiedOptimization
