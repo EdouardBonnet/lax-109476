@@ -99,7 +99,7 @@ at revision `30c319dd52ca89cfa82a68352b1f39f4f3026fc2`. The adaptation
 specializes the Farkas induction to real coefficients, exposes the elimination
 step in the Lax proof network, and updates the proof to the pinned toolchain.
 Each adapted source retains the original MIT license; see
-[the attribution and license](proofs/THIRD_PARTY_LICENSES.md).
+[the attribution and license](THIRD_PARTY_LICENSES.md).
 
 This submission supplies generic LP foundations. A multicommodity-flow
 submission still needs to express its own LP, establish the correspondence
