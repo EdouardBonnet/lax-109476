@@ -230,7 +230,14 @@ LP's registered binary size using bounded bit-counting loops. The
 modules compute exactly its common denominator, including empty products,
 while preserving the loaded program. `RamStoredProgram` supplies the shared
 storage invariant. `RamScaleCoordinate` verifies the per-coordinate rational
-scaling operation needed to clear denominators into integer data.
+scaling operation needed to clear denominators into integer data. `RamSolverInitialization`
+connects decoding, size computation, and denominator computation in one fixed
+command, with a polynomial execution bound in the original encoded input size.
+`RamScaleArray` and `RamScaleBlock` verify the complete array scaling loops,
+preserving the source data and their positive denominators. Registered-RAM
+tests cover empty inputs, signed and zero coefficients, exact denominator
+clearing, and rejected malformed inputs.
+
 
 
 The `StandardForm`, `DeterminantBounds`, `SmallFeasiblePoint`,
@@ -276,6 +283,16 @@ Pinned archive dependencies:
 
 Lean is pinned to `v4.33.0` and mathlib to
 `db584cd6d46c92f209a44c0f1c829460d327499d`.
+
+The `RamClearProgram` and `RamSolverFrontEnd` modules connect decoding,
+canonical input-size computation, the common denominator, and whole-program
+denominator clearing to the mathematical integer LP. This combined frontend
+has polynomial instruction and word bounds for every larger word width.
+`RamNaturalPower`, `RamCoordinateCap`, and `RamFeasibilityScales` implement
+bounded natural powers, factorials, the coordinate cap, the relaxation
+denominator, the outer scale, the ball exponent, and the cut budget. These are internal steps; the public exact-solver
+theorem remains open until normalization, exact recovery, and output are
+connected to the registered RAM.
 
 ## Build and preview
 

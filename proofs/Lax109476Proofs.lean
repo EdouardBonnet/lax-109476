@@ -118,3 +118,11 @@ import Lax109476Proofs.RamStoredProgram
 import Lax109476Proofs.RamProgramSize
 import Lax109476Proofs.RamProgramDenominator
 import Lax109476Proofs.RamScaleCoordinate
+import Lax109476Proofs.RamSolverInitialization
+import Lax109476Proofs.RamScaleArray
+import Lax109476Proofs.RamScaleBlock
+import Lax109476Proofs.RamClearProgram
+import Lax109476Proofs.RamSolverFrontEnd
+import Lax109476Proofs.RamNaturalPower
+import Lax109476Proofs.RamCoordinateCap
+import Lax109476Proofs.RamFeasibilityScales
