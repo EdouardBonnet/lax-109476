@@ -317,6 +317,21 @@ floor and inverted fractional tail on reduced nonnegative rationals.
 execution, bounds, and costs, allowing distinct certificate query dimensions
 in a single uniform command.
 
+`ContinuedFractionFold`, `RamContinuedFractionFoldStep`, and
+`RamContinuedFractionConvergent` implement backward reconstruction from the
+quotient stack. `RamConvergentBounds` gives polynomial word and instruction
+bounds in the input bit bound and recursion depth. The candidate checker,
+first-match scan, and `RamRationalReconstruction` implement exact interval
+reconstruction and compute the scan limit from the stored denominator's bit
+length. Compiled RAM tests cover convergents, termination, interval checks,
+denominator rejection, and unsuccessful reconstruction. `RamStoredFeasibility`
+recomputes the canonical size, denominator, and precision for each auxiliary
+rational LP before running the complete feasibility algorithm.
+`RamRationalHalf`, `RamRationalMidpoint`, `RamBisectionCommit`, and
+`RamBisectionLoop` implement interval halving and compose it with a stored
+threshold query that preserves the search registers. Their loop specification
+returns the exact mathematical bisection interval with an explicit cost bound.
+
 ## Build and preview
 
 Run `lax build --replay` from this directory to validate the concepts,
