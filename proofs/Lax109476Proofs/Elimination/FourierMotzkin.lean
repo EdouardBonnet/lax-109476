@@ -57,9 +57,9 @@ of a finite linear system `A.mulVec x ≤ b`.
 
 It constructs a finite index type `κ` and a nonnegative matrix `M` such that:
 * the last column is eliminated: `(M * A) i (Fin.last n) = 0`,
-* feasibility is preserved and reflected:
-  the original system in `n+1` variables is feasible iff the projected system
-  `(M * (A.submatrix id Fin.castSucc)).mulVec x' ≤ M.mulVec b` is feasible in `n` variables.
+* the projected feasible set is preserved exactly: each retained vector `x'`
+  satisfies the reduced system iff it extends by a last coordinate to a
+  solution of the original system.
 
 This is the standard elimination step used in proofs of Farkas-type results.
 -/
@@ -74,9 +74,9 @@ theorem Fourier_Motzkin
   ∃ κ : Type u, ∃ _ : Fintype κ, ∃ M : Matrix κ m F,
       (∀ i j, 0 ≤ M i j) ∧
       (∀ i, (M * A) i (Fin.last n) = 0) ∧
-      ((∃ x : Fin (n + 1) → F, A.mulVec x ≤ b) ↔
-        ∃ x' : Fin n → F,
-          (M * (A.submatrix id Fin.castSucc)).mulVec x' ≤ M.mulVec b) := by
+      (∀ x' : Fin n → F,
+        (M * (A.submatrix id Fin.castSucc)).mulVec x' ≤ M.mulVec b ↔
+          ∃ t : F, A.mulVec (Fin.lastCases t x') ≤ b) := by
   /-
 
   ----------------------------------------------
@@ -120,13 +120,12 @@ theorem Fourier_Motzkin
 
   -/
   have hlft: ∀ x : Fin (n + 1) → F,
-        A.mulVec x ≤ b → ∃ x' : Fin n → F, A'.mulVec x' ≤ b' := by
+        A.mulVec x ≤ b → A'.mulVec (fun j => x (Fin.castSucc j)) ≤ b' := by
     intro x hx
     -- Just dropping the last coordinate is going to be enough
     -- But the value of the last coordinate will have work to do.
     let x' : Fin n → F := fun j => x (Fin.castSucc j)
     let xₙ := x (Fin.last n)
-    use x'
     intro i
     match i with
     | Sum.inl (iPos, iNeg) =>
@@ -204,7 +203,7 @@ theorem Fourier_Motzkin
 
   -/
   have hright : ∀ x' : Fin n → F,
-        A'.mulVec x' ≤ b' → ∃ x : Fin (n + 1) → F, A.mulVec x ≤ b := by
+        A'.mulVec x' ≤ b' → ∃ t : F, A.mulVec (Fin.lastCases t x') ≤ b := by
     intro x' hsol
     -- Candidate lower/upper bounds for the eliminated variable.
     let valpos : posRow → F := fun i => posb i - (posCoeffs i) ⬝ᵥ x'
@@ -227,7 +226,7 @@ theorem Fourier_Motzkin
     -- Reassemble the full vector from `xₙ` and `x'`.
     let x : Fin (n + 1) → F := Fin.lastCases xₙ x'
     -- We need to show that this will work
-    refine ⟨x, fun i => ?_⟩
+    refine ⟨xₙ, fun i => ?_⟩
     by_cases hlast : Aₙ i = 0
     -- The zero row is the easy case
     · let iZero : zeroRow := ⟨i, Finset.mem_filter.mpr ⟨Finset.mem_univ i, hlast⟩⟩
@@ -378,20 +377,56 @@ theorem Fourier_Motzkin
     | inr iZero =>
       rw [Matrix.mul_apply]
       simp [M, Aₙ, (Finset.mem_filter.mp iZero.property).2]
-  -- Main equivalence rewritten in terms of `M`.
-  have h_equiv_M :
-      (∃ x : Fin (n + 1) → F, A.mulVec x ≤ b) ↔
-        ∃ x' : Fin n → F,
-          (M * A₀).mulVec x' ≤ M.mulVec b := by
+  -- Every reduced solution extends with its retained coordinates unchanged.
+  have h_equiv_M : ∀ x' : Fin n → F,
+      (M * A₀).mulVec x' ≤ M.mulVec b ↔
+        ∃ t : F, A.mulVec (Fin.lastCases t x') ≤ b := by
+    intro x'
     constructor
-    · rintro ⟨x, hx⟩
-      rcases hlft x hx with ⟨x', hElim⟩
-      refine ⟨x', ?_⟩
-      simpa only [hA'_eq, hb'_eq] using hElim
-    · rintro ⟨x', hxElim⟩
-      have hA'ineq : A'.mulVec x' ≤ b' := by
-        simpa only [hA'_eq, hb'_eq] using hxElim
-      exact hright x' hA'ineq
-  -- Package all existential witnesses and side conditions.
+    · intro hxElim
+      apply hright x'
+      simpa only [hA'_eq, hb'_eq] using hxElim
+    · rintro ⟨t, ht⟩
+      have hElim := hlft (Fin.lastCases t x') ht
+      simpa only [Fin.lastCases_castSucc, hA'_eq, hb'_eq] using hElim
   exact ⟨κ, inferInstance, M, hM_nonneg, hM_last_zero, by simpa [A₀] using h_equiv_M⟩
+
+/-- Pointwise projection equivalence implies simultaneous feasibility. -/
+theorem feasibility_iff_of_projection
+    {m κ : Type u} {F : Type v} [Fintype m] [Fintype κ]
+    [Field F] [LinearOrder F] [IsStrictOrderedRing F] {n : ℕ}
+    (A : Matrix m (Fin (n + 1)) F) (b : m → F) (M : Matrix κ m F)
+    (hprojection : ∀ x' : Fin n → F,
+      (M * (A.submatrix id Fin.castSucc)).mulVec x' ≤ M.mulVec b ↔
+        ∃ t : F, A.mulVec (Fin.lastCases t x') ≤ b) :
+    (∃ x : Fin (n + 1) → F, A.mulVec x ≤ b) ↔
+      ∃ x' : Fin n → F,
+        (M * (A.submatrix id Fin.castSucc)).mulVec x' ≤ M.mulVec b := by
+  constructor
+  · rintro ⟨x, hx⟩
+    refine ⟨fun j => x (Fin.castSucc j), (hprojection _).mpr ?_⟩
+    refine ⟨x (Fin.last n), ?_⟩
+    have hreconstruct : Fin.lastCases (x (Fin.last n)) (fun j => x (Fin.castSucc j)) = x := by
+      ext j
+      refine Fin.lastCases ?_ (fun i => ?_) j <;> simp
+    simpa only [hreconstruct] using hx
+  · rintro ⟨x', hx'⟩
+    obtain ⟨t, ht⟩ := (hprojection x').mp hx'
+    exact ⟨Fin.lastCases t x', ht⟩
+
+/-- The feasibility equivalence used by the Farkas induction follows from
+pointwise preservation of the projected feasible set. -/
+theorem Fourier_Motzkin_feasibility
+    {m : Type u} {F : Type v} [Fintype m]
+    [Field F] [LinearOrder F] [IsStrictOrderedRing F] {n : ℕ}
+    (A : Matrix m (Fin (n + 1)) F) (b : m → F) :
+    ∃ κ : Type u, ∃ _ : Fintype κ, ∃ M : Matrix κ m F,
+      (∀ i j, 0 ≤ M i j) ∧
+      (∀ i, (M * A) i (Fin.last n) = 0) ∧
+      ((∃ x : Fin (n + 1) → F, A.mulVec x ≤ b) ↔
+        ∃ x' : Fin n → F,
+          (M * (A.submatrix id Fin.castSucc)).mulVec x' ≤ M.mulVec b) := by
+  obtain ⟨κ, inst, M, hM, hzero, hprojection⟩ := Fourier_Motzkin A b
+  exact ⟨κ, inst, M, hM, hzero, feasibility_iff_of_projection A b M hprojection⟩
+
 end Lax109476Proofs.Elimination

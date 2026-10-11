@@ -10,7 +10,9 @@ One variable can be eliminated from a finite system of real linear
 inequalities by nonnegative combinations of its rows. Pair each row with
 positive coefficient of the eliminated variable with each row with negative
 coefficient, and retain the rows with zero coefficient. The resulting finite
-system is feasible exactly when the original system is feasible.
+system describes exactly the projection of the original feasible set: a
+retained vector satisfies it exactly when some eliminated coordinate extends
+that same vector to a solution of the original system.
 
 # Formalization notes
 
@@ -31,8 +33,8 @@ axiom exists_elimination :
     ∃ κ : Type, ∃ _ : Fintype κ, ∃ M : Matrix κ m ℝ,
       (∀ i j, 0 ≤ M i j) ∧
       (∀ i, (M * A) i (Fin.last n) = 0) ∧
-      ((∃ x : Fin (n + 1) → ℝ, A.mulVec x ≤ b) ↔
-        ∃ x' : Fin n → ℝ,
-          (M * (A.submatrix id Fin.castSucc)).mulVec x' ≤ M.mulVec b)
+      (∀ x' : Fin n → ℝ,
+        (M * (A.submatrix id Fin.castSucc)).mulVec x' ≤ M.mulVec b ↔
+          ∃ t : ℝ, A.mulVec (Fin.lastCases t x') ≤ b)
 
 end Lax109476.FourierMotzkin

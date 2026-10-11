@@ -164,10 +164,13 @@ theorem Farkas1ExhaustWith
 that dependency in the submission's proof network. -/
 theorem Farkas1Exhaust {n : ℕ} (A : Matrix m (Fin n) ℝ) (b : m → ℝ) :
     Farkas1Primal A b ∨ Farkas1Dual A b :=
-  Farkas1ExhaustWith Lax109476.FourierMotzkin.exists_elimination A b
+  Farkas1ExhaustWith (fun m _ n A b => by
+    obtain ⟨κ, inst, M, hM, hzero, hprojection⟩ :=
+      Lax109476.FourierMotzkin.exists_elimination m n A b
+    exact ⟨κ, inst, M, hM, hzero, feasibility_iff_of_projection A b M hprojection⟩) A b
 
 /-- Rational elimination is proved directly by the generic elimination proof. -/
 theorem Farkas1ExhaustRat {n : ℕ} (A : Matrix m (Fin n) ℚ) (b : m → ℚ) :
     Farkas1Primal A b ∨ Farkas1Dual A b :=
-  Farkas1ExhaustWith (fun _ _ _ A b => Fourier_Motzkin A b) A b
+  Farkas1ExhaustWith (fun _ _ _ A b => Fourier_Motzkin_feasibility A b) A b
 end Lax109476Proofs.Elimination

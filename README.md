@@ -13,7 +13,7 @@ over real variables, with rational output certificates.
 
 | Result | Supplied proof | Assumptions from this submission |
 | --- | --- | --- |
-| Fourier–Motzkin elimination | Nonnegative row combinations and finite compatible bounds | None |
+| Fourier–Motzkin elimination | Pointwise projection equivalence via nonnegative row combinations | None |
 | Farkas certificate existence | Induct on variables after adding nonnegativity rows | Fourier–Motzkin elimination |
 | Weak duality | Finite bilinear sum and inequality calculation | None |
 | Complementary slackness | Nonnegative summands of the duality gap | None |
@@ -89,8 +89,20 @@ with an outcome tag and the corresponding rational vectors.
 The proof package is checked by Lean and strict kernel replay. Compiled RAM
 checks cover arithmetic, continued fractions and reconstruction, coordinate
 query construction, all three certificate-system builders, zero dimensions,
-and certificate output. The full solver is verified by execution and resource
-proofs rather than a full native execution benchmark.
+and certificate output. Their source, concrete input words, expected output
+words, word widths, and instruction allowances are committed in
+[`checks/`](checks/README.md). Run all component checks and the
+Fourier–Motzkin projection regression against the pinned dependencies with:
+
+```sh
+bash scripts/check-ram.sh
+```
+
+Each RAM check compiles its structured command with the pinned compiler,
+executes the resulting registered word-RAM program from zero memory, and
+requires the expected output and an explicit halt within its allowance.
+The full solver is verified by execution and resource proofs rather than a
+full native execution benchmark.
 
 Run `lax build --replay` from this directory to check the submission and
 extract its proof dependencies. Run `lax serve . --port 8124` for a local

@@ -15,7 +15,9 @@ conclusion: Lax109476.FourierMotzkin.exists_elimination
 Partition the rows according to the sign of the eliminated variable's
 coefficient. Combine every positive row with every negative row using
 nonnegative multipliers, and retain the zero rows. A finite family of
-compatible lower and upper bounds admits a witness for the removed variable.
+compatible lower and upper bounds admits a witness for the removed variable,
+for each fixed solution of the reduced system. Reconstruction keeps all
+retained coordinates unchanged, giving the pointwise projection equivalence.
 
 # Attribution
 
@@ -29,9 +31,9 @@ theorem fourier_motzkin :
       ∃ κ : Type, ∃ _ : Fintype κ, ∃ M : Matrix κ m ℝ,
         (∀ i j, 0 ≤ M i j) ∧
         (∀ i, (M * A) i (Fin.last n) = 0) ∧
-        ((∃ x : Fin (n + 1) → ℝ, A.mulVec x ≤ b) ↔
-          ∃ x' : Fin n → ℝ,
-            (M * (A.submatrix id Fin.castSucc)).mulVec x' ≤ M.mulVec b) := by
+        (∀ x' : Fin n → ℝ,
+          (M * (A.submatrix id Fin.castSucc)).mulVec x' ≤ M.mulVec b ↔
+            ∃ t : ℝ, A.mulVec (Fin.lastCases t x') ≤ b) := by
   intro m _ n A b
   exact Lax109476Proofs.Elimination.Fourier_Motzkin A b
 
