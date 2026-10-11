@@ -29,251 +29,75 @@ over real variables, with rational output certificates.
 | Rational certificate soundness | Cast exact checks into the reals and verify all three outcomes | Weak duality; Farkas soundness; improving-direction soundness |
 | Polynomial RAM output size | At most one output word per instruction; bounded bit size per word | None |
 | Polynomial-size rational certificates | Clear denominators, choose independent supports, and bound Gram determinants | Exact rational certificate existence |
+| Exact polynomial-time solver | One fixed RAM program: ellipsoid decisions, exact recovery, and certificate output | Exact rational certificate existence |
 | Certified polynomial-time optimization | Reuse the solver's output and apply soundness | Exact polynomial-time solver; rational certificate soundness |
 
-The real LP duality and certificate-soundness chain is now fully proved:
-the elimination proof closes Farkas' lemma, and Farkas' lemma closes primal
-attainment and optimal dual multipliers, hence strong duality.
-All three rational certificate outcomes have proved existence and polynomial
-encoding-size bounds independent of the solver. The explicit bound is
-`512 * (L + 1)^3`, where `L` is the registered binary input size.
+All 18 public statements have supplied proofs. The proof network records the
+public assumptions used by those proofs; internal implementation lemmas are
+checked in the same proof package.
 
-The exact polynomial-time solver is the remaining open foundation. Certified
-optimization has a conditional proof depending on this solver and remains
-unproved in the network until the solver is proved.
+## Exact solver and ellipsoid implementation
 
-Finishing the solver requires a formal polynomial-time LP algorithm, exact
-rational arithmetic and rounding bounds, exact certificate recovery, and
-execution and runtime proofs for the registered RAM (or a proved reduction
-through an equivalent computational model). Fourier–Motzkin elimination
-supplies no polynomial runtime bound. No new algorithmic axiom has been
-added to discharge this obligation.
+The solver returns one of three exact rational certificates: matching primal
+and dual feasible points for optimality, nonnegative Farkas multipliers for
+infeasibility, or a feasible base point with an improving recession direction
+for unboundedness. Certificate soundness establishes each outcome for real
+optimization. Dimensions may be zero.
 
-Internal progress toward an ellipsoid implementation is included in
-`proofs/Lax109476Proofs/EllipsoidStep.lean` and
-`proofs/Lax109476Proofs/RationalRounding.lean`,
-`proofs/Lax109476Proofs/EllipsoidRounding.lean`, and
-`proofs/Lax109476Proofs/EllipsoidBounds.lean`. The first proves the normalized
-central-cut matrix's positive definiteness, inverse, containment, and determinant
-factor in dimensions at least two. It bounds the square root of that determinant
-factor, allows a small uniform enlargement, and proves an iterated contraction
-bound. The second defines computable rational grid rounding and an
-integer-square-root approximation, proves their real error bounds, and bounds
-their encodings using the registered binary-word encoding. A magnitude-based
-encoding bound controls a rounded value independently of its original denominator.
-The rounding module proves quadratic-form error bounds, inverse-form
-antitonicity, and preservation of positive definiteness and containment after
-entrywise rounding with a diagonal allowance. It also quantifies the enlargement
-needed for a displaced center. The bounds module defines the rational update
-for a general positive definite shape, proves its inverse, containment, determinant
-factor, and conditioning bounds, and connects the update to shape rounding.
-It gives an iterated conditioning bound and a dyadic precision schedule whose
-denominator bit length is linear in the conditioning exponent and dimension.
-These internal lemmas are not connected to a solver proof and do not make the
-solver node proved.
+The implementation includes the complete rational ellipsoid feasibility
+routine: central cuts, positive-definite shape updates, rational rounding,
+integer-square-root approximation, containment, conditioning, determinant
+contraction, separation, and finite termination. Padding handles dimensions
+zero and one. Bounded feasible points and bounded Farkas multipliers justify
+exact feasibility decisions through a normalized relaxation.
 
-The additional `EllipsoidCenter`, `EllipsoidPrecision`, `EllipsoidDeterminant`,
-`EllipsoidIteration`, and `EllipsoidSequence` proof modules define and verify the
-complete stored rational center and shape update. A dyadic denominator handles
-both center errors and the relative shape error. Relative quadratic-form bounds
-imply determinant bounds, so the same rounded update both preserves the cut
-portion and contracts the square-root determinant. The actual recursive shape
-sequence starts at the identity and remains positive definite with lower form
-bound `2^(-2k)` and upper form bound `4^k`. The center sequence preserves points
-retained by the supplied cuts. At iteration `k`, the grid denominator has
-`2k + 3n + 10` bits. After `4(n+1)(Bn+1)` cuts, the square-root determinant is
-below the threshold `2^(-Bn)`.
+Exact recovery combines coordinate threshold queries, interval bisection,
+and continued-fraction reconstruction. Slack-variable systems and determinant
+bounds provide the required coordinate and denominator bounds. The solver
+builds the three certificate systems from runtime input dimensions, selects
+a feasible system, recovers its point, and emits canonical certificate words.
+Its source coefficient arrays remain immutable while separate workspaces
+hold the decision and recovery systems.
 
-The `Relaxation`, `EllipsoidBall`, `EllipsoidTermination`, `RationalSeparation`,
-`EllipsoidSearch`, `NormalizedFeasibility`, `IntegerFeasibilityDecision`,
-`FeasibilityPadding`, `IterationBudget`, and `RationalFeasibilityDecision`
-modules connect these updates to a computable exact feasibility decision.
-The separation routine scans integer rows with rational comparisons; every
-nonzero selected row meets the required normal-length bound. Bounded Farkas
-multipliers give a relaxation gap, and bounded feasible witnesses give a ball
-inside the normalized relaxed LP. Ball containment supplies the determinant
-lower bound needed for finite termination. Two dummy variables handle all
-input dimensions. The cut budget is at most `640000 * (L + 1)^4`.
+`RamExactSolverProgram.solve` is one fixed structured command. The proofs
+cover its branching execution, accepted noncanonical rational encodings,
+and termination on every logical word-list input. Malformed inputs have
+no mathematical certificate requirement. `RamSolverAllocation` supplies the
+initial array extents, `RamAutomaticLayout` proves a compiler layout, and
+`RamUniformSolver` transfers execution to the existing registered RAM model.
 
-The `RationalReconstruction` module supplies a computable continued-fraction
-scan with a proved exact interval-reconstruction guarantee. Two successive
-tails halve the denominator, so the scan examines only twice the approximation's
-denominator bit length. Distinct rationals with denominator at most `B` are
-separated by at least `1/B²`.
+The runtime predicate is `Lax759944.RamPolytime.RamPolytime`, using binary
+input size, polynomial word width, and polynomial instruction bounds. The
+transfer uses the existing `Lax808846.Ram` semantics and its proved compiler.
+Correctness and execution bounds hold for every larger word width. Polynomial
+bounds are proved for the entire program, including decoding, denominator
+clearing, auxiliary queries, exact recovery, and output.
 
-The `EllipsoidStateSize` module bounds each stored shape entry by `4^k` and
-each center coordinate by `2^(k+2)`. The shape and center grid representations
-then bound each rational entry's registered encoding size by `60 + 6k + 14n`.
-`BinaryOptimization` and `CoordinateOptimization` combine logarithmically many
-threshold queries with reconstruction to recover an attained coordinate minimum
-exactly, given a denominator bound. `LexicographicSupport` proves that successive
-coordinate minima in standard form have independent support; `RationalMinima`
-proves rational attainment of each coordinate minimum. `LexicographicMinima`
-and `LexicographicBounds` give one determinant cap from the original system for
-every coordinate of the selected point. `PointRecovery`, `IntegerPointRecovery`,
-and `IndexedPointRecovery` implement exact point recovery, including slack
-variables and explicit finite-index equivalences.
+Standalone rational certificates have encoding size at most
+`512 * (L + 1)^3`, where `L` is the registered binary input size. The normalized
+feasibility cut budget is at most `640000 * (L + 1)^4`; the complete solver's
+word and instruction bounds are the polynomials constructed in
+`RamUniformSolverBounds` and `RamResourcePolynomial`.
 
-`CertificateSystems`, `CertificateSearch`, `WordDecoding`, and `WordSolver`
-complete the executable recovery pipeline. The total word-list function decodes
-the registered input, clears denominators, recovers primal–dual, Farkas, or
-recession witnesses, checks them exactly, and encodes the resulting certificate.
-Its functional correctness is proved for all dimensions and all rational inputs.
-Oversized malformed dimensions are rejected before vector allocation. Search
-stops at a feasible center and at the first valid certificate, without allocating
-the full cut budget or evaluating later certificate systems.
-The scan stores each updated matrix and center in vectors and advances the
-stored state once per failed separation test.
+## Encodings and validation
 
-`RationalArithmeticBounds` proves numerator and denominator bounds for exact
-addition, multiplication, inversion, and finite sums, together with their
-encoding bounds. `BinaryOptimizationBounds` bounds dyadic search thresholds and
-reconstructed coordinates for arbitrary query answers, including unsuccessful
-certificate branches. `RamArithmetic` supplies verified GCD and fraction
-reduction programs, and `RamSquareRoot` supplies verified integer square root;
-their costs are linear in bit length. `RamRational` verifies signed addition,
-multiplication, and inversion with reduced numerators and denominators.
-`RamComparison` verifies exact order comparisons, including either sign of
-zero, and `RamBitLength` verifies a linear-time bit-counting loop.
-`RamRounding` connects grid flooring and upper square-root approximation to
-verified integer division, GCD, and square-root instructions. `RamEncoding`
-verifies canonical rational output, including clearing the sign of zero.
-`RamPrimitiveBounds` gives uniform costs linear in the operands' bit-length
-cap, and `RamRationalArrays` verifies bounds-checked rational loads and
-canonical stores using three arrays for signs, numerators, and denominators.
-`RamDotProduct` verifies the full rational dot-product loop, including empty
-vectors, preservation of the input arrays, and an instruction bound polynomial
-in vector length and operand bit length. `RamMatrixRows` verifies row-major
-slices, bounded row addresses, and matrix-row dot products. `RamSeparation`
-verifies a complete scan whose numeric result is the same first violated
-inequality as mathematical separation, with a polynomial instruction bound.
-`RamZeroArray` verifies rational-array initialization, and `RamMatrixVector`
-verifies the complete matrix-vector product used by ellipsoid updates, including
-output storage reuse and a polynomial instruction bound. `RamEllipsoidForm`
-verifies the stored quadratic form and its polynomial instruction bound.
-`RamEllipsoidScalars` verifies the dimension factor, rational inflation factor,
-the quadratic-form factors, and the dyadic precision schedule.
-`RamMatrixStorage` connects flat array entries to matrix rows, and
-`RamFractionInterface` exposes checked arithmetic and signed subtraction
-through rational-value specifications. `RamCenterCoordinate` and
-`RamCenterUpdate` verify the complete rounded center-update loop, its relation
-to the mathematical ellipsoid center, and a polynomial instruction bound.
-`RamShapeCoordinate` and `RamShapeUpdate` verify the full rounded shape-update
-loop, including diagonal correction and inflation, its equality with the
-mathematical update, and a polynomial instruction bound.
-`RamEllipsoidCoefficients` verifies initialization and storage of all five
-step coefficients, derives their rational height bounds, and bounds the
-instruction count by a polynomial.
-`RamEllipsoidUpdate` composes the center and shape loops.
-`RamEllipsoidWordBounds` provides one sufficient word-capacity bound for
-the whole cut, and `RamEllipsoidPrecision` verifies the precision schedule
-while preserving the stored quadratic form. `RamEllipsoidStep` verifies
-the complete cut body against the mathematical rounded step and proves a
-polynomial instruction bound.
-`RamCopy` verifies copying canonical rational arrays in linear time, preserving
-the source. `RamCommitState` installs the next center and shape for the following
-iteration and restores the logical dimension after copying the flattened matrix.
-`RamEllipsoidStoredBounds` bounds the rational entries produced by a cut,
-and `RamAdvanceState` verifies the complete cut, state installation, and
-counter increment with one uniform RAM command and an explicit cost bound.
-`RamEllipsoidBitBounds` gives a sufficient polynomial word width from the
-dimension, coefficient bit length, and iteration number, including every larger
-word width. `RamInitialState` verifies initialization of the identity shape,
-zero center, and iteration counter, including empty dimensions.
-`RamRowCopy` copies a selected matrix row into the normal vector with a
-linear instruction bound while preserving the source matrix.
-`RamTrajectoryBounds` connects the RAM update to the actual ellipsoid
-trajectory and derives one word bound for every cut up to a fixed budget
-from the proved global center and shape bounds.
-`RamNonzero` verifies a linear scan for a nonzero rational coordinate.
-`RamNormalSelection` verifies extraction of the first violated integer row
-and replacement of a zero row by the fixed nonzero normal used by the trajectory.
-`RamSearchStep` verifies separation followed by a cut or termination at a
-feasible center, preserving the original constraint count across shape updates.
-`RamSearchLoop` verifies the initialized bounded search, its exact agreement
-with the first feasible center in the mathematical trajectory, and a linear
-factor in the cut budget for its instruction bound.
-`RamSearchBounds` supplies sufficient polynomial word and instruction bounds
-for this complete initialized search, uniformly over every larger word width.
-`RecoveryArithmeticBounds` and `SolverOutputBounds` bound the coordinates
-actually produced by recovery and prove the cubic size bound for the returned
-certificate. `DecodingSizeBounds` proves that decoding noncanonical input
-fractions cannot increase canonical input size. `WordSolverSize` gives the
-cubic output-size bound on every word list and a sufficient polynomial word
-width for the physical input and returned output.
-`RamTransfer` proves the bridge from
-bounded structured execution through Lax's verified compiler to the registered
-uniform polynomial-time RAM predicate. Bounds for complete intermediate
-computations and execution and runtime proofs for the
-registered RAM remain to be formalized. The functional-correctness proof does
-not discharge the public polynomial-time solver theorem.
+Each rational uses three natural words: sign, absolute numerator, and
+positive denominator. Canonical encodings use reduced fractions. Program
+encodings start with row and column counts, followed by the row-major
+matrix, row bounds, and objective coefficients. Certificate encodings start
+with an outcome tag and the corresponding rational vectors.
 
+The proof package is checked by Lean and strict kernel replay. Compiled RAM
+checks cover arithmetic, continued fractions and reconstruction, coordinate
+query construction, all three certificate-system builders, zero dimensions,
+and certificate output. The full solver is verified by execution and resource
+proofs rather than a full native execution benchmark.
 
-`RamInput`, `RamReadFraction`, `RamReadArray`, and `RamReadMatrix` verify
-length-prefixed input reads, exact rational normalization, and uniform array
-loops with polynomial instruction bounds. The reader handles truncated triples,
-invalid signs and zero denominators, retains an earlier invalidity flag, and
-uses a canonical zero placeholder after failure so subsequent stores remain
-bounded. Successful vector parses match the functional decoder, and row-major
-matrix input matches the separation oracle's flat storage, including empty
-dimensions. Execution tests use the registered RAM directly. The `RamReadHeader`,
-`RamReadBlock`, `RamReadBody`, and `RamDecoder` modules connect these pieces
-into one uniform LP decoder. It rejects excessive dimensions before the
-matrix count or array loops, and rejects trailing data. Its complete word
-bound is `4 * (L + 2)` before compiler-layout allowance, and its instruction
-bound is `(36 * (L + 1) + 115) * (L² + 4L + 3) + 127` for input bit size `L`.
-The decoder is proved to load exactly the registered LP encoding in every
-dimension and at every larger word width.
-`RamEncodedSize`, `RamSizeBlock`, and `RamProgramSize` compute the canonical
-LP's registered binary size using bounded bit-counting loops. The
-`RamDenominatorProduct`, `RamDenominatorBlock`, and `RamProgramDenominator`
-modules compute exactly its common denominator, including empty products,
-while preserving the loaded program. `RamStoredProgram` supplies the shared
-storage invariant. `RamScaleCoordinate` verifies the per-coordinate rational
-scaling operation needed to clear denominators into integer data. `RamSolverInitialization`
-connects decoding, size computation, and denominator computation in one fixed
-command, with a polynomial execution bound in the original encoded input size.
-`RamScaleArray` and `RamScaleBlock` verify the complete array scaling loops,
-preserving the source data and their positive denominators. Registered-RAM
-tests cover empty inputs, signed and zero coefficients, exact denominator
-clearing, and rejected malformed inputs.
+Run `lax build --replay` from this directory to check the submission and
+extract its proof dependencies. Run `lax serve . --port 8124` for a local
+preview.
 
-
-
-The `StandardForm`, `DeterminantBounds`, `SmallFeasiblePoint`,
-`RationalSizeBounds`, `EncodingSize`, `IntegerEncoding`, `IntegerCertificates`,
-and `SmallCertificates` modules prove the independent certificate-size bound.
-Minimal-support conic representations have independent columns, and Cramer's
-rule on their integer Gram matrix bounds every reduced coordinate. Clearing
-denominators uses their total encoded size. Optimality witnesses are compressed
-together with equality of objectives; Farkas and recession witnesses first
-normalize the strict inequality. This argument permits zero dimensions and
-lower-dimensional feasible sets. Its public dependency is certificate existence.
-
-## Exact computation
-
-Each rational is encoded by three natural numbers: a sign bit, the absolute
-numerator, and the positive denominator of its canonical reduced form.
-Program encodings start with the numbers of rows and columns, followed by
-the row-major matrix, row bounds, and objective coefficients. Certificate
-encodings begin with a status tag and the relevant rational vectors.
-
-An optimality certificate carries matching primal and dual feasible points.
-An infeasibility certificate carries nonnegative Farkas multipliers. An
-unboundedness certificate carries both a feasible base point and a
-nonnegative improving recession direction. Every output inequality is
-checked over the rationals; the soundness theorem establishes its meaning
-for real optimization.
-
-The runtime claim is `Lax759944.RamPolytime.RamPolytime`, which uses the
-binary encoding size, polynomial word-size and instruction bounds, and one
-uniform RAM program. It refers to the existing registered
-`Lax808846.Ram` machine semantics. It does not assume unit-cost exact
-rational arithmetic or polynomial time merely in the number of variables.
-Malformed word-list inputs impose no mathematical LP output requirement;
-the computation predicate still requires a total polynomial-time function.
-
-Pinned archive dependencies:
+## Pinned dependencies
 
 | Package | Repository | Revision | Subdirectory |
 | --- | --- | --- | --- |
@@ -284,124 +108,17 @@ Pinned archive dependencies:
 Lean is pinned to `v4.33.0` and mathlib to
 `db584cd6d46c92f209a44c0f1c829460d327499d`.
 
-The `RamClearProgram` and `RamSolverFrontEnd` modules connect decoding,
-canonical input-size computation, the common denominator, and whole-program
-denominator clearing to the mathematical integer LP. This combined frontend
-has polynomial instruction and word bounds for every larger word width.
-`RamNaturalPower`, `RamCoordinateCap`, and `RamFeasibilityScales` implement
-bounded natural powers, factorials, the coordinate cap, the relaxation
-denominator, the outer scale, the ball exponent, and the cut budget. These are internal steps; the public exact-solver
-theorem remains open until exact recovery, certificates, and output are
-connected to the registered RAM.
+## Sources
 
-The bounded feasibility-parameter modules prove polynomial word and runtime
-bounds for the complete parameter setup. `RamPadMatrix`, `RamPadBound`, and
-`RamQueryPadding` build the padded matrix and bounds and set their dimensions.
-`RamNormalizedEntry`, `RamNormalizedMatrix`, `RamNormalizedBoundEntry`,
-`RamNormalizedBound`, and `RamNormalizeQuery` build the scaled inequalities
-and relaxed nonnegativity rows and produce the exact stored input required
-by ellipsoid search. `RamNormalizedBounds` bounds the coefficient heights of
-that system. `RamFeasibilitySetup`, `RamIntegerFeasibility`, and
-`RamPaddedFeasibility` connect these builders to bounded ellipsoid search.
-`RamFeasibilityQuery`, `RamRationalFeasibility`, and `RamEncodedFeasibility`
-compose decoding, canonical input-size computation, denominator clearing,
-padding, parameter setup, normalization, and exact feasibility decision.
-Their correctness proofs apply to every input dimension, with explicit
-uniform polynomial word and instruction bounds and every larger word width.
-The public solver node is still open pending the recovery, certificate,
-and output connection. `RamContinuedFractionStep` implements the exact
-floor and inverted fractional tail on reduced nonnegative rationals.
-`ContinuedFractionBounds` bounds iterated tails and convergents, and
-`RamContinuedFractionStack` implements the bounded quotient-stack loop.
-`RamArrayRelabel` proves that fixed workspace copies preserve the same
-execution, bounds, and costs, allowing distinct certificate query dimensions
-in a single uniform command.
-
-`ContinuedFractionFold`, `RamContinuedFractionFoldStep`, and
-`RamContinuedFractionConvergent` implement backward reconstruction from the
-quotient stack. `RamConvergentBounds` gives polynomial word and instruction
-bounds in the input bit bound and recursion depth. The candidate checker,
-first-match scan, and `RamRationalReconstruction` implement exact interval
-reconstruction and compute the scan limit from the stored denominator's bit
-length. Compiled RAM tests cover convergents, termination, interval checks,
-denominator rejection, and unsuccessful reconstruction. `RamStoredFeasibility`
-recomputes the canonical size, denominator, and precision for each auxiliary
-rational LP before running the complete feasibility algorithm.
-`RamRationalHalf`, `RamRationalMidpoint`, `RamBisectionCommit`, and
-`RamBisectionLoop` implement interval halving and compose it with a stored
-threshold query that preserves the search registers. Their loop specification
-returns the exact mathematical bisection interval with an explicit cost bound.
-
-`RamRecoveryQuery` builds each coordinate threshold LP from the immutable
-system and its recovered prefix. `RamRecoveryThreshold` connects that builder
-to the complete ellipsoid feasibility routine and preserves the search
-registers. `RamBinaryMinimum` and `RamRecoveryMinimum` compose the queries,
-bisection, and rational reconstruction. Compiled RAM tests cover this
-composition and the query matrices, including fixed coordinates and negative
-bounds. `RamPointRecovery` repeats recovery over all coordinates, and
-`RamPointRecoveryBounds` gives explicit polynomial word and instruction bounds
-in the dimensions and bit bounds. `RamStandardPointRecovery` recovers a feasible
-standard-form integer-system point with the original determinant bound.
-`RamEquationBuilder` constructs the slack-variable equation system directly
-from the stored integer LP. `StandardPointCapComparison` shows that the
-certificate cap also bounds its lexicographically minimal standard-form point,
-and `RamRecoverFeasibleSystem` composes runtime cap computation, initialization,
-and recovery with uniform polynomial word and instruction bounds.
-
-`CertificateFamilyPrograms`, `CertificateFamilyEntries`, and
-`CertificateFamilyHeight` identify and bound the three certificate systems.
-`RamCertificateFamilies` builds their matrices and bounds using runtime
-indices. Nine compiled RAM tests cover all three builders, including empty
-rows and columns. `RamWriteCertificate` emits their nonslack coordinates in
-canonical form; four compiled tests cover the outcome tags, discarded slack
-coordinates, empty vectors, and negative zero. `RamRecoverCertificate` connects
-bounded recovery to the validity and encoding of each outcome certificate.
-
-`RamCertificateSetup` saves the original integer coefficients, dimensions,
-and input-size parameter. `RamCertificateArrayRelabel` isolates workspace
-arrays while keeping those coefficients immutable. `RamCertificateDecision`
-copies a stored certificate system into its separate query workspace, runs
-the complete feasibility routine, and preserves the stored system.
-`RamExactSolverProgram` assembles the fixed frontend, selection branches,
-recovery, and output command. Its register and array preservation checks pass.
-The final solver theorem still needs the combined branching execution, total handling
-of arbitrary logical inputs, and transfer of the overall polynomial bounds
-to the registered RAM. `RamDecodedProgram` identifies the stored rational
-program produced by an arbitrary accepted header and gives a uniform
-polynomial bound on its canonical encoding size, including noncanonical
-rational triples. Total frontend and solver execution remain separate proof
-obligations.
-
-## Build and preview
-
-Run `lax build --replay` from this directory to validate the concepts,
-extract the kernel assumptions of each proof, and replay the proof checks.
-Run `lax serve . --port 8124` for a local preview.
-
-## Sources and use by Leighton–Rao
-
-The mathematical statements follow Alexander Schrijver's *Theory of
-Linear and Integer Programming* (1986), particularly the duality and
-rational-polyhedron results. The polynomial-time solvability claim is the
-classical rational LP theorem originating with
-[Khachiyan (1979)](https://www.mathnet.ru/eng/dan42319), with exact outcome
-certificates. The central-cut calculations follow
+The statements follow Schrijver's *Theory of Linear and Integer Programming*
+(1986). Polynomial-time rational LP solvability originates with
+[Khachiyan (1979)](https://www.mathnet.ru/eng/dan42319). The central-cut
+calculations follow
 [Goemans' ellipsoid-method lecture](https://ocw.mit.edu/courses/6-854j-advanced-algorithms-fall-2008/bc621c481eecc9cb9c645eb44538a7f3_lect9_26.pdf).
-The implementation is incomplete as described above.
 
 The elimination and unrestricted-variable Farkas proofs adapt
 [Jyotirmoy Bhattacharya's `farkas_lean`](https://github.com/jmoy/farkas_lean)
-at revision `30c319dd52ca89cfa82a68352b1f39f4f3026fc2`. The adaptation
-uses the Farkas induction over ordered fields, exposes the real elimination
-step in the Lax proof network, and updates the proof to the pinned toolchain.
-The rational instance uses the same proved elimination construction directly.
-Each adapted source retains the original MIT license; see
-[the attribution and license](THIRD_PARTY_LICENSES.md).
-
-This submission supplies generic LP foundations. A multicommodity-flow
-submission still needs to express its own LP, establish the correspondence
-between LP points and graph flows or metrics, account for the size of the
-LP representation, and connect constructive rounding to RAM computation.
-The potentially exponential path formulation alone does not establish a
-polynomial-time flow algorithm; it must be replaced by a polynomial-size
-formulation or paired with a proved separation/reduction argument.
+at revision `30c319dd52ca89cfa82a68352b1f39f4f3026fc2`. The adaptation exposes
+the real elimination step in the proof network and instantiates the same
+elimination construction over the rationals. Adapted sources retain the
+original MIT license; see [the attribution and license](THIRD_PARTY_LICENSES.md).
