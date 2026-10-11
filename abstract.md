@@ -1,6 +1,5 @@
 This submission treats finite real linear programs in the form
 $\max\{c^T x:Ax\le b,\ x\ge0\}$ and their nonnegative-multiplier duals.
-
 The mathematical concepts include weak and strong duality, complementary
 slackness, primal attainment, Farkas' alternative, and certificates of
 unboundedness. Exact rational certificates cover optimality, infeasibility,
