@@ -342,8 +342,35 @@ bounds. `RamPointRecovery` repeats recovery over all coordinates, and
 `RamPointRecoveryBounds` gives explicit polynomial word and instruction bounds
 in the dimensions and bit bounds. `RamStandardPointRecovery` recovers a feasible
 standard-form integer-system point with the original determinant bound.
-Connecting the certificate-system builders and output to the final uniform
-solver remains unfinished.
+`RamEquationBuilder` constructs the slack-variable equation system directly
+from the stored integer LP. `StandardPointCapComparison` shows that the
+certificate cap also bounds its lexicographically minimal standard-form point,
+and `RamRecoverFeasibleSystem` composes runtime cap computation, initialization,
+and recovery with uniform polynomial word and instruction bounds.
+
+`CertificateFamilyPrograms`, `CertificateFamilyEntries`, and
+`CertificateFamilyHeight` identify and bound the three certificate systems.
+`RamCertificateFamilies` builds their matrices and bounds using runtime
+indices. Nine compiled RAM tests cover all three builders, including empty
+rows and columns. `RamWriteCertificate` emits their nonslack coordinates in
+canonical form; four compiled tests cover the outcome tags, discarded slack
+coordinates, empty vectors, and negative zero. `RamRecoverCertificate` connects
+bounded recovery to the validity and encoding of each outcome certificate.
+
+`RamCertificateSetup` saves the original integer coefficients, dimensions,
+and input-size parameter. `RamCertificateArrayRelabel` isolates workspace
+arrays while keeping those coefficients immutable. `RamCertificateDecision`
+copies a stored certificate system into its separate query workspace, runs
+the complete feasibility routine, and preserves the stored system.
+`RamExactSolverProgram` assembles the fixed frontend, selection branches,
+recovery, and output command. Its register and array preservation checks pass.
+The final solver theorem still needs the combined branching execution, total handling
+of arbitrary logical inputs, and transfer of the overall polynomial bounds
+to the registered RAM. `RamDecodedProgram` identifies the stored rational
+program produced by an arbitrary accepted header and gives a uniform
+polynomial bound on its canonical encoding size, including noncanonical
+rational triples. Total frontend and solver execution remain separate proof
+obligations.
 
 ## Build and preview
 
