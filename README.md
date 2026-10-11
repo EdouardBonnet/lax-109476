@@ -332,6 +332,19 @@ rational LP before running the complete feasibility algorithm.
 threshold query that preserves the search registers. Their loop specification
 returns the exact mathematical bisection interval with an explicit cost bound.
 
+`RamRecoveryQuery` builds each coordinate threshold LP from the immutable
+system and its recovered prefix. `RamRecoveryThreshold` connects that builder
+to the complete ellipsoid feasibility routine and preserves the search
+registers. `RamBinaryMinimum` and `RamRecoveryMinimum` compose the queries,
+bisection, and rational reconstruction. Compiled RAM tests cover this
+composition and the query matrices, including fixed coordinates and negative
+bounds. `RamPointRecovery` repeats recovery over all coordinates, and
+`RamPointRecoveryBounds` gives explicit polynomial word and instruction bounds
+in the dimensions and bit bounds. `RamStandardPointRecovery` recovers a feasible
+standard-form integer-system point with the original determinant bound.
+Connecting the certificate-system builders and output to the final uniform
+solver remains unfinished.
+
 ## Build and preview
 
 Run `lax build --replay` from this directory to validate the concepts,
