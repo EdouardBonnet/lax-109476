@@ -5,6 +5,8 @@ The mathematical concepts include weak and strong duality, complementary
 slackness, primal attainment, Farkas' alternative, and certificates of
 unboundedness. Exact rational certificates cover optimality, infeasibility,
 and unboundedness of rational programs optimized over real variables.
+The elimination and Farkas proofs adapt Jyotirmoy Bhattacharya's
+MIT-licensed [farkas_lean](https://github.com/jmoy/farkas_lean) formalization.
 
 The algorithmic scope is one uniform exact polynomial-time solver, measured
 in the binary size of the rational input and using the registered word-RAM
