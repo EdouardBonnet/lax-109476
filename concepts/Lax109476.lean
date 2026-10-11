@@ -3,7 +3,6 @@ import Lax109476.WeakDuality
 import Lax109476.FarkasCertificate
 import Lax109476.FarkasLemma
 import Lax109476.FourierMotzkin
-import Lax109476.RamOutputSize
 import Lax109476.PrimalAttainment
 import Lax109476.StrongDuality
 import Lax109476.FarkasSoundness

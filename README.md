@@ -27,12 +27,11 @@ over real variables, with rational output certificates.
 | Rational feasible-point existence | Eliminate over the rationals and cast a contrary Farkas certificate into the reals | Farkas certificate soundness |
 | Exact rational certificate existence | Rationalize a matching primal–dual pair or normalized direction; use rational Farkas for infeasibility | Rational feasible-point existence; strong duality; improving-direction existence |
 | Rational certificate soundness | Cast exact checks into the reals and verify all three outcomes | Weak duality; Farkas soundness; improving-direction soundness |
-| Polynomial RAM output size | At most one output word per instruction; bounded bit size per word | None |
 | Polynomial-size rational certificates | Clear denominators, choose independent supports, and bound Gram determinants | Exact rational certificate existence |
-| Exact polynomial-time solver | One fixed RAM program: ellipsoid decisions, exact recovery, and certificate output | Exact rational certificate existence |
+| Exact polynomial-time solver | One fixed RAM program: ellipsoid decisions, exact recovery, and certificate output | Exact rational certificate existence; certificate soundness; Farkas soundness; rational feasible-point existence |
 | Certified polynomial-time optimization | Reuse the solver's output and apply soundness | Exact polynomial-time solver; rational certificate soundness |
 
-All 18 public statements have supplied proofs. The proof network records the
+All 17 public statements have supplied proofs. The proof network records the
 public assumptions used by those proofs; internal implementation lemmas are
 checked in the same proof package.
 
